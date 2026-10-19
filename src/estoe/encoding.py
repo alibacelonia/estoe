@@ -16,7 +16,7 @@ def _object(pairs: list[tuple[str, object]]) -> dict[str, object]:
     result = {}
     for key, value in pairs:
         if key in result:
-            raise EstoeError("invalid_content")
+            raise EstoeError("invalid_content", reason="duplicate_keys")
         result[key] = value
     return result
 
@@ -27,13 +27,21 @@ def parse_secret(content: str) -> dict[str, str]:
             raise EstoeError("content_limit")
         values = json.loads(content, object_pairs_hook=_object)
         if not isinstance(values, dict) or not values:
-            raise EstoeError("invalid_content")
+            raise EstoeError("invalid_content", reason="object_required")
         for key, value in values.items():
-            if not KEY.fullmatch(key) or not isinstance(value, str) or "\0" in value:
-                raise EstoeError("invalid_content")
+            if not KEY.fullmatch(key):
+                raise EstoeError("invalid_content", reason="invalid_keys")
+            if not isinstance(value, str):
+                raise EstoeError("invalid_content", reason="string_values")
+            if "\0" in value:
+                raise EstoeError("invalid_content", reason="nul")
             value.encode("utf-8")  # Reject unpaired Unicode surrogates.
         return dict(sorted(values.items()))
-    except (ValueError, TypeError, UnicodeError, RecursionError):
+    except json.JSONDecodeError:
+        raise EstoeError("invalid_content", reason="json_syntax") from None
+    except UnicodeError:
+        raise EstoeError("invalid_content", reason="unicode") from None
+    except (ValueError, TypeError, RecursionError):
         raise EstoeError("invalid_content") from None
 
 

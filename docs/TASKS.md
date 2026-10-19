@@ -23,7 +23,7 @@ executed; waived is an explicit owner risk acceptance, not a passing check.
 | RC-03 | P1 | done | Refresh beginner-friendly release documentation | RC-02 | 37 documentation/CLI tests passed; shell syntax, local links, example options and sample output checked offline; Ruff passed |
 | RC-04 | P1 | done | Run multi-cloud Linux PR CI | branch push/PR approved | PR #3 initial revision 0d6608c passed Linux Python 3.12–3.14 CI and dependency audit; later commits must pass again; no merge/tag/upload authorized |
 | RC-05 | P1 | done | Prepare stable 0.2.0 metadata/changelog | preceding release gates | 38 focused tests, Ruff and fresh-environment wheel help/version passed; source/wheel inventories reviewed; version/lock/CI/docs agree; not published |
-| RC-06 | P1 | todo | Improve safe validation feedback | owner UX request | Fixed actionable validation categories, no payload/key disclosure, preservation and CLI tests |
+| RC-06 | P1 | done | Improve safe validation feedback | owner UX request | 94 focused UX/CLI/docs tests and full 207-test offline suite passed; Ruff passed; fixed advice retains invalid_content, no offending key/value echo, all-provider output preservation |
 
 Historical AWS release preparation: owner selected MIT. Version was 0.1.0; Linux CI verifies built-wheel
 help, pull help, and version. Local macOS tests remain 92 passed. Dependency audit passed;
@@ -106,3 +106,12 @@ No live AWS requests or secret writes were performed.
   fresh virtual environment, and ran help/pull-help/version outside the source tree.
   Reviewed both archive inventories: no generated dotenv files, credentials or key files.
   This is package preparation, not a published release.
+- Safe validation UX: 94 focused tests and the full 207-test macOS suite passed; Ruff
+  lint/format and diff whitespace checks passed. Added allowlisted advice for JSON syntax,
+  root shape, duplicate keys, names, string types, NUL and Unicode; invalid_content/exit 1
+  stay compatible. All three providers preserve existing output and leave no new output
+  or temp files on invalid content. Help, README and both guides explain the fixes.
+- Final review checked error classification, fixed-message boundaries, unknown-reason
+  fallback, destination preservation, documentation examples and package version consistency.
+  No new dependency or credential/source-value logging was introduced. Remote checks on
+  the latest PR revision are required; live Azure testing remains waived, not passed.

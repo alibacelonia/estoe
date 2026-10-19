@@ -37,6 +37,8 @@ def build_parser() -> argparse.ArgumentParser:
             "AWS: existing credential chain/profile (including SSO login when needed).\n"
             "Azure: existing az login session; --tenant-id optionally selects its tenant.\n"
             "GCP: Application Default Credentials (gcloud auth application-default login).\n"
+            'Secret content: nonempty JSON object with string values, e.g. {"PORT":"8000"}.\n'
+            "Do not store KEY=value text, nested objects, or unquoted numbers.\n"
             "Preview retrieves the secret and may incur cloud charges; it shows keys only.\n"
             "Generated files contain plaintext secrets: keep them out of version control.\n"
             "Load with python-dotenv and interpolate=False to preserve dollar expressions.\n"

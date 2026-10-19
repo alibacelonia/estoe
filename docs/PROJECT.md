@@ -45,6 +45,7 @@ local configuration without manually copying values. Public examples must be fic
 | R-13 | Keep tests offline. | Socket-denial guard, fake SDK, synthetic secrets, and temporary destinations cover all above failures; no AWS account/model required. |
 | R-14 | Document least privilege. | IAM examples use placeholder exact secret ARN with GetSecretValue; optional KMS Decrypt scoped to a customer-managed key. No credentials or real identifiers in examples. |
 | R-15 | Ship an installable CLI. | Built wheel installs in a fresh environment; help/version work outside the source tree; package checks, formatting, lint, offline tests, and dependency audit pass. |
+| R-16 | Explain content validation safely. | Keep the invalid_content code and exit 1; fixed messages distinguish JSON syntax/root shape/duplicate keys/variable names/string types/NUL/Unicode without echoing content, offending keys, positions, or raw exceptions. Tests prove every provider preserves existing output and creates no file on invalid content. |
 
 Implementation is verified through offline tests and local packaging. The owner reported
 successful AWS pull and GCP pull/preview on macOS; agent verification did not retrieve live

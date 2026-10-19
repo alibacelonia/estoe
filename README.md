@@ -187,7 +187,7 @@ deliberately value-free; raw SDK warnings and exceptions are not shown.
 
 | Error | What to check |
 | --- | --- |
-| `invalid_content` | Use a nonempty flat JSON object of strings, not `KEY=value` text. See the example above. |
+| `invalid_content` | Read the explanation after the code: JSON validation distinguishes syntax, shape, duplicate keys, names, string types, NUL and Unicode. No offending key/value is displayed. |
 | `credentials` | Refresh the correct login. GCP needs ADC; Azure needs Azure CLI. |
 | `access_denied` | Check this secret's read permission, identity, and IAM propagation; do not grant broad admin just to read. |
 | `not_found` | Check the secret name and selected vault/project/region. |
@@ -196,6 +196,24 @@ deliberately value-free; raw SDK warnings and exceptions are not shown.
 | `tracked` / `unignored` | Choose an untracked destination and add your own ignore rule. |
 | `exists` | Review the existing file, then confirm replacement or deliberately use `--overwrite`. |
 | `timeout` / `throttled` | Check connectivity/quota and retry manually when appropriate. |
+
+### Common secret-format mistakes
+
+The cloud secret's **entire value** must be JSON, not the resulting dotenv file.
+For example, store `{"PORT":"8000"}`, not `PORT=8000` or `{"PORT":8000}`.
+
+| Mistake | How to fix it |
+| --- | --- |
+| `KEY=value`, single quotes, or a trailing comma | Use valid JSON with double quotes, as shown above. |
+| Empty object, array, or plain string | Use a nonempty object with one or more named variables. |
+| Numbers, booleans, null, nested objects or arrays | Represent each variable as a string; for example `"ENABLED":"true"`. estoe does not flatten nested data. |
+| Repeated keys | Keep each key only once; estoe will not silently pick a value. |
+| Names with spaces/hyphens or a leading digit | Use letters/underscores first, then letters/digits/underscores. |
+| NUL characters or invalid Unicode | Correct the source text before retrying; estoe will not silently alter it. |
+
+Correct the intended secret through your normal authorized workflow, then run preview
+again. An invalid secret does not create a new output or replace an existing one.
+Do not paste real secret content into a JSON-validation website or public issue.
 
 On an external macOS drive with “Ignore ownership on this volume” enabled, choose
 `--output /absolute/path/on/a/private/volume/.env.local` instead. estoe never changes

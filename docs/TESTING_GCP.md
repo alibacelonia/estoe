@@ -170,8 +170,11 @@ files, ADC files, tokens, actual identifiers, or raw SDK response dumps in publi
   plus process startup/cleanup. No automatic multi-secret retry loop is run.
 - `integrity`: payload checksum did not match; no output is written. Retry once manually
   and investigate persistent corruption rather than disabling verification.
-- `invalid_content`: verify flat JSON string values and UTF-8. Regional paths/full resource
-  paths supplied as `--secret` are unsupported; supply the secret ID and `--project` separately.
+- `invalid_content`: follow the fixed validation explanation. Store the entire JSON object
+  from `examples/synthetic-secret.json`, not dotenv text; quote numbers/booleans and avoid
+  nested objects. Verify UTF-8 too. See the README's [format troubleshooting](../README.md#common-secret-format-mistakes).
+  Do not print secret values or paste them into online validators. Regional paths/full
+  resource paths supplied as `--secret` are unsupported; supply the ID and `--project` separately.
 
 ## 8. Cleanup (manual and optional)
 

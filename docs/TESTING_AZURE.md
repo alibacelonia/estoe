@@ -163,7 +163,11 @@ credentials, actual account identifiers, or raw cloud exceptions into issues.
 - `access_denied`: confirm the identity, RBAC propagation, vault data-plane role, networking,
   and that the secret is enabled. Subscription Reader/Contributor is not Secrets User.
 - `timeout`: check CLI/network availability; the SDK worker has a 15-second deadline.
-- `invalid_content`: check that the secret value is a flat JSON object of strings.
+- `invalid_content`: follow the fixed explanation (syntax, duplicate keys, invalid names
+  or value types). Store the entire JSON object from `examples/synthetic-secret.json`,
+  not dotenv text. Quote numbers/booleans; do not nest objects. See the README's
+  [format troubleshooting](../README.md#common-secret-format-mistakes). No secret values
+  should be printed or pasted into online validators.
 - `filesystem`, `tracked`, or `unignored`: follow the file-safety message; prefer a private
   Git-ignored file rather than overriding protection.
 

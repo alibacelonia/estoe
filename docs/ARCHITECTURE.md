@@ -11,6 +11,10 @@ Manager client, with CRC32C validation. SDK imports occur only inside reader fun
 `encoding.py` validates and encodes; `files.py`
 owns Git checks, directory-pinned POSIX operations, and macOS mount checks. `errors.py`
 defines fixed diagnostic codes/messages. No provider payload is logged.
+JSON validation chooses a fixed, allowlisted explanation for `invalid_content`;
+neither offending keys/values nor decoder exception text enters a diagnostic. The
+error code and exit status remain stable. Unknown explanations fall back to the generic
+message. JSON validation occurs in the parent after the bounded provider pipe returns.
 
 ## Data flow
 

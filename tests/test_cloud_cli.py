@@ -188,3 +188,58 @@ def test_manual_fixture_is_flat_synthetic_json():
         "API_URL": "https://example.com",
         "API_TOKEN": "synthetic-test-value",
     }
+
+
+@pytest.mark.parametrize(
+    "provider,options,name",
+    [
+        ("aws", [], "AWSProvider"),
+        ("azure", ["--vault-url", "https://example-vault.vault.azure.net/"], "AzureProvider"),
+        ("gcp", ["--project", "example-project"], "GCPProvider"),
+    ],
+)
+@pytest.mark.parametrize("existing", [False, True])
+@pytest.mark.parametrize(
+    "content,advice",
+    [
+        ("PRIVATE_KEY=synthetic-sensitive-canary", "not valid JSON"),
+        ('{"PRIVATE_KEY":{"INNER":"synthetic-sensitive-canary"}}', "Every value must be a string"),
+        ('{"PRIVATE_KEY":"synthetic-sensitive-canary","PRIVATE_KEY":"x"}', "duplicate JSON keys"),
+    ],
+)
+def test_validation_advice_preserves_output_for_every_provider(
+    provider, options, name, existing, content, advice, tmp_path, monkeypatch, capsys
+):
+    class Fake:
+        def __init__(self, *args):
+            pass
+
+        def fetch(self, secret):
+            return content
+
+    monkeypatch.setattr(f"estoe.cli.{name}", Fake)
+    output = tmp_path / ".env"
+    if existing:
+        output.write_text("original")
+    args = [
+        "pull",
+        "--provider",
+        provider,
+        "--secret",
+        "example",
+        *options,
+        "--output",
+        str(output),
+    ]
+    if existing:
+        args.append("--overwrite")
+    assert main(args) == 1
+    captured = capsys.readouterr()
+    assert "invalid_content:" in captured.err
+    assert advice in captured.err
+    for sensitive in ("synthetic-sensitive-canary", "PRIVATE_KEY", "INNER"):
+        assert sensitive not in captured.out + captured.err
+    assert output.exists() is existing
+    if existing:
+        assert output.read_text() == "original"
+    assert not list(tmp_path.glob(".estoe-*"))

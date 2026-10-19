@@ -18,6 +18,10 @@
   waived, not passed; actual Azure credentials, permissions and networking remain unverified.
 - Version metadata is prepared for 0.2.0. The published release remains AWS-only v0.1.0;
   no new Git tag, GitHub release or PyPI upload has been created.
+- Actionable, fixed JSON validation explanations for syntax, root shape, duplicate keys,
+  variable names, non-string values, NUL and Unicode; retain `invalid_content` and exit 1.
+  No offending key/value or raw parser exception is disclosed. Help and guides explain
+  common mistakes; regression tests cover output preservation for all three providers.
 
 ## 0.1.0 — 2026-10-19
 
