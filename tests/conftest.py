@@ -15,7 +15,7 @@ def offline_environment(monkeypatch):
     monkeypatch.setattr(socket.socket, "connect_ex", denied)
     monkeypatch.setattr(socket, "create_connection", denied)
     for name in tuple(os.environ):
-        if name.startswith(("AWS_", "GIT_")):
+        if name.startswith(("AWS_", "GIT_", "AZURE_", "GOOGLE_", "GCLOUD_", "CLOUDSDK_")):
             monkeypatch.delenv(name)
     monkeypatch.setenv("AWS_EC2_METADATA_DISABLED", "true")
     monkeypatch.setenv("AWS_CONFIG_FILE", "/dev/null")

@@ -61,3 +61,59 @@
 - Consequences: installation is available from the tagged GitHub URL or wheel, while
   `pip install estoe` from PyPI is not advertised. Account/profile/selector details and
   generated dotenv content are excluded from commits and release notes.
+
+## ADR-008: Separate cloud readers behind the existing isolated export boundary
+
+- Status: accepted for the owner-requested Azure/GCP implementation.
+- Decision: retain the AWS import/interface and factor its worker into a shared runner.
+  Add Azure/GCP modules with lazy official-SDK imports and the same fetch(secret)->str
+  contract. Keep --provider explicit; validate provider-specific options before SDK access.
+- Consequences: existing AWS syntax remains valid. Common JSON/encoding/preview/filesystem
+  behavior stays in one path. All SDK dependencies are included in the installation; no
+  extra install flags or runtime downloading is needed. The next version is 0.2.0.dev0;
+  the released AWS tag and its artifacts remain unchanged.
+
+## ADR-009: Explicit Azure CLI identity and constrained Key Vault URLs
+
+- Status: accepted.
+- Decision: use AzureCliCredential with a 5-second process timeout and optional --tenant-id.
+  Require --vault-url on the public azure.net vault suffix, without userinfo/ports/query
+  or non-root path. Read the latest secret via SecretClient, keep challenge-resource checks
+  enabled, cap one retry, and map SDK errors to fixed messages.
+- Consequences: local developers can use az login without creating client secrets. No
+  environment/managed-identity fallback is implied, and sovereign clouds are deferred.
+  The credential may launch the installed Azure CLI; that trusted helper is outside
+  Python log suppression. The worker deadline and SDK process timeout bound normal use.
+
+## ADR-010: GCP ADC, global resource names, and payload integrity
+
+- Status: accepted.
+- Decision: require a project ID/number and a simple secret ID; read the global latest
+  version via Secret Manager's REST transport using ADC. Disable automatic API retries,
+  use a 5-second request timeout plus the shared worker deadline, and verify CRC32C/UTF-8.
+- Consequences: --project selects the resource, not the identity or quota project. ADC
+  setup/quota configuration is managed by the user; no service-account keys are created.
+  REST avoids native gRPC diagnostics bypassing Python logging. Regional endpoints and
+  explicit version selection require future scope. A checksum mismatch fails closed.
+
+## ADR-011: Keep SDK warnings behind the safe diagnostic boundary
+
+- Status: accepted for release-readiness work.
+- Context: GCP ADC can emit a Python warning directly to stderr even when SDK logging is
+  disabled. Python warnings may contain uncontrolled provider context.
+- Decision: suppress Python warnings inside the isolated worker's reader call, including
+  imports and credential resolution. Preserve warning filters outside that scope and use
+  fixed estoe errors plus documented setup/troubleshooting advice instead of SDK messages.
+- Consequences: successful reads remain successful with warnings configured as errors.
+  Quota-project advice must stay discoverable in the GCP guide; this is not suppression of
+  arbitrary native or external credential-helper output.
+
+## ADR-012: Waive Azure live validation without claiming a pass
+
+- Status: accepted by the owner for this release preparation.
+- Decision: proceed using the offline Azure adapter/CLI regression suite; the owner
+  explicitly chose to skip live Azure smoke testing. Record the successful owner-run GCP
+  pull/preview separately. Never treat a waiver or mocked test as live verification.
+- Consequences: real Azure credentials, tenant permissions, RBAC propagation and network
+  access remain unverified. Keep the sandbox guide available. Branch push and PR are
+  approved for Linux CI; merge, release/tag and PyPI upload are not authorized.

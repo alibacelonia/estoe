@@ -1,9 +1,10 @@
-"""Minimal provider contract and bounded AWS adapter."""
+"""Shared provider contract/worker boundary and AWS adapter."""
 
 from __future__ import annotations
 
 import logging
 import multiprocessing
+import warnings
 from collections.abc import Callable
 from multiprocessing.connection import Connection
 from typing import Protocol
@@ -94,10 +95,21 @@ def read_aws(secret: str, profile: str | None, region: str | None, session_facto
 
 
 def _worker(connection: Connection, secret: str, profile: str | None, region: str | None) -> None:
-    # SDK debug logging can include payloads. This process never emits SDK diagnostics.
+    send_result(connection, read_aws, secret, profile, region)
+
+
+def send_result(connection: Connection, reader: Callable, *arguments: str | None) -> None:
+    # SDK logging and warnings may include sensitive context. Suppress both in this worker;
+    # authentication/setup advice belongs in our value-free diagnostics and user guides.
     logging.disable(logging.CRITICAL)
     try:
-        value = read_aws(secret, profile, region)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            value = reader(*arguments)
+        if not isinstance(value, str):
+            raise EstoeError("invalid_content")
+        if len(value.encode("utf-8")) > MAX_SECRET_BYTES:
+            raise EstoeError("content_limit")
         connection.send_bytes(b"+" + value.encode("utf-8"))
     except EstoeError as exc:
         connection.send_bytes(b"-" + exc.code.encode("ascii"))
@@ -122,35 +134,39 @@ class AWSProvider:
         self.worker = worker
 
     def fetch(self, secret: str) -> str:
-        # A process boundary bounds SDK client construction, credential resolution, retries,
-        # and the read itself. A timed-out thread would keep running after the CLI returns.
-        context = multiprocessing.get_context("spawn")
-        receiver, sender = context.Pipe(duplex=False)
-        process = context.Process(
-            target=self.worker, args=(sender, secret, self.profile, self.region), daemon=True
-        )
-        started = False
-        try:
-            process.start()
-            started = True
-            sender.close()
-            if not receiver.poll(self.deadline):
-                raise EstoeError("timeout")
-            message = receiver.recv_bytes(MAX_SECRET_BYTES + 1)
-            if message.startswith(b"+"):
-                return message[1:].decode("utf-8")
-            code = message[1:].decode("ascii") if message.startswith(b"-") else "provider"
-            raise EstoeError(code)
-        except (OSError, EOFError, UnicodeError):
-            raise EstoeError("provider") from None
-        finally:
-            receiver.close()
-            sender.close()
-            if started:
-                if process.is_alive():
-                    process.terminate()
-                process.join(timeout=1)
-                if process.is_alive():
-                    process.kill()
-                    process.join()
-                process.close()
+        return run_isolated(self.worker, secret, self.profile, self.region, deadline=self.deadline)
+
+
+def run_isolated(
+    worker: Callable, *arguments: str | None, deadline: float = PROVIDER_DEADLINE
+) -> str:
+    # A process boundary bounds SDK client construction, credential resolution, retries,
+    # and the read itself. A timed-out thread would keep running after the CLI returns.
+    context = multiprocessing.get_context("spawn")
+    receiver, sender = context.Pipe(duplex=False)
+    process = context.Process(target=worker, args=(sender, *arguments), daemon=True)
+    started = False
+    try:
+        process.start()
+        started = True
+        sender.close()
+        if not receiver.poll(deadline):
+            raise EstoeError("timeout")
+        message = receiver.recv_bytes(MAX_SECRET_BYTES + 1)
+        if message.startswith(b"+"):
+            return message[1:].decode("utf-8")
+        code = message[1:].decode("ascii") if message.startswith(b"-") else "provider"
+        raise EstoeError(code)
+    except (OSError, EOFError, UnicodeError):
+        raise EstoeError("provider") from None
+    finally:
+        receiver.close()
+        sender.close()
+        if started:
+            if process.is_alive():
+                process.terminate()
+            process.join(timeout=1)
+            if process.is_alive():
+                process.kill()
+                process.join()
+            process.close()

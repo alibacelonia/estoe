@@ -19,6 +19,8 @@ def test_pull_help_explains_profile_and_safety(capsys):
     output = capsys.readouterr().out
     for phrase in ("--profile", "--region", "--preview", "plaintext", "SSO", "charges"):
         assert phrase in output
+    assert "JSON object with string values" in output
+    assert "KEY=value" in output
 
 
 def test_missing_required_arguments_are_usage_errors(capsys):

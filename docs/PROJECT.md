@@ -5,7 +5,9 @@
 Local MVP implementation, 2026-10-19. Owner confirmed the name `estoe`,
 JSON-key expansion as default, `--profile`, useful `--help`, and SSD project location.
 Owner authorized feature implementation. Python/uv/argparse and macOS/Linux are used with
-the concrete encoding and filesystem decisions below; no live reads or publication are authorized.
+the concrete encoding and filesystem decisions below. No agent live reads or cloud changes
+are authorized. The AWS release is published; the owner approved pushing the multi-cloud
+branch and opening a PR only (not merging, tagging, or uploading packages).
 
 Developers should be able to retrieve one explicitly selected cloud secret and generate
 local configuration without manually copying values. Public examples must be fictional.
@@ -43,17 +45,40 @@ local configuration without manually copying values. Public examples must be fic
 | R-13 | Keep tests offline. | Socket-denial guard, fake SDK, synthetic secrets, and temporary destinations cover all above failures; no AWS account/model required. |
 | R-14 | Document least privilege. | IAM examples use placeholder exact secret ARN with GetSecretValue; optional KMS Decrypt scoped to a customer-managed key. No credentials or real identifiers in examples. |
 | R-15 | Ship an installable CLI. | Built wheel installs in a fresh environment; help/version work outside the source tree; package checks, formatting, lint, offline tests, and dependency audit pass. |
+| R-16 | Explain content validation safely. | Keep the invalid_content code and exit 1; fixed messages distinguish JSON syntax/root shape/duplicate keys/variable names/string types/NUL/Unicode without echoing content, offending keys, positions, or raw exceptions. Tests prove every provider preserves existing output and creates no file on invalid content. |
 
 Implementation is verified through offline tests and local packaging. The owner reported
-a successful AWS pull on macOS; agent verification did not retrieve live secrets. Linux
-execution is a remote CI gate for this release.
+successful AWS pull and GCP pull/preview on macOS; agent verification did not retrieve live
+secrets. Azure is covered by offline tests only: the owner waived its live-test release
+gate after being informed that credentials, permissions and networking remain unverified.
+Linux execution is still a remote CI gate for this release.
 
 ## Out of scope
 
-Azure/GCP implementations in v0.1; whole-secret/raw mode; multi-secret discovery/merging;
+AWS v0.1.0 remains released; the owner authorized Azure/GCP development for the next version.
+Whole-secret/raw mode; multi-secret discovery/merging;
 automatic refresh; cloud writes/IAM provisioning; deployment; shell execution; stdout or
 clipboard secret export; automatic login; Windows confidentiality guarantees; real data in
 fixtures; private reference-code redistribution.
+
+## Azure/GCP extension requirements
+
+Owner-authorized feature scope (2026-10-19); existing AWS commands stay compatible.
+
+| ID | Requirement | Acceptance criterion |
+| --- | --- | --- |
+| MC-01 | Require explicit provider selection: aws, azure, gcp. | Invalid provider/option combinations fail with usage exit 2 before SDK access. Shared preview/output/overwrite semantics stay unchanged. |
+| MC-02 | Azure needs --vault-url and secret name; optional --tenant-id selects the existing CLI tenant. | HTTPS public Azure Key Vault hosts only, no credentials/ports/query/extra path; one get_secret call using AzureCliCredential and the latest version. No login, resource discovery or writes. |
+| MC-03 | GCP needs --project and secret ID; credentials use ADC. | Exactly projects/PROJECT/secrets/SECRET/versions/latest is read with access_secret_version; UTF-8 and CRC32C validated before common JSON validation. No discovery, login, service-account key creation, or writes. |
+| MC-04 | SDK execution is isolated for every provider. | Existing deadline, bounded result pipe, suppressed SDK logs, fixed errors, and process termination apply; SDK constructors remain lazy. |
+| MC-05 | Share output security and failure behavior. | Every provider is tested through preview and export with synthetic content; malformed/oversized payloads and auth/permission/not-found/throttle/timeout failures disclose no values and preserve destination. |
+| MC-06 | Detailed manual test guides. | Separate Azure/GCP guides cover prerequisites, explicit targets, synthetic JSON creation, setup versus read-only IAM, CLI versus SDK auth, preview/pull, expected results, negative tests, troubleshooting, costs and non-automatic cleanup. |
+
+Azure public cloud only and latest global GCP secret versions are supported initially.
+Azure sovereign clouds, GCP regional secrets, arbitrary endpoints, and explicit version
+selection are deferred. Azure uses CLI credentials specifically, not an implicit fallback
+across environment/service identities. GCP ADC may use an existing configured identity;
+--project selects the resource and does not select the authenticated principal.
 
 ## Implementation decisions and remaining approval
 
