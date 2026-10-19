@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased — 0.2.0.dev0
+
+- Azure Key Vault reader using the existing Azure CLI identity, required vault URL,
+  optional tenant UUID, latest-version reads, endpoint validation and safe errors.
+- GCP Secret Manager reader using ADC, explicit project/secret ID, latest-version reads
+  over REST, CRC32C verification, UTF-8 validation and safe errors.
+- Shared worker isolation and existing output safeguards for all providers; cross-provider
+  CLI options are rejected. AWS commands remain compatible and provider remains required.
+- Detailed Azure/GCP synthetic-secret provisioning, IAM/authentication and manual testing
+  guides, plus a fictional JSON fixture. No cloud setup or live reads performed by the agent.
+
 ## 0.1.0 — 2026-10-19
 
 First AWS release: one JSON secret to a private dotenv file, explicit profiles/regions,

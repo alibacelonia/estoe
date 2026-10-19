@@ -2,7 +2,7 @@ project:
   name: estoe
   description: "Secret to Env — generate local dotenv files from cloud secrets"
   type: cli
-  stage: aws-mvp
+  stage: multi-cloud-development
 stack:
   language: python
   python: ">=3.12"
@@ -10,7 +10,7 @@ stack:
   package_manager: uv
 providers:
   mvp: aws-secrets-manager
-  future: [azure-key-vault, google-secret-manager]
+  implemented: [aws-secrets-manager, azure-key-vault, google-secret-manager]
 constraints:
   offline_tests: true
   no_secret_logging: true

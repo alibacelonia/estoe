@@ -50,10 +50,30 @@ execution is a remote CI gate for this release.
 
 ## Out of scope
 
-Azure/GCP implementations in v0.1; whole-secret/raw mode; multi-secret discovery/merging;
+AWS v0.1.0 remains released; the owner authorized Azure/GCP development for the next version.
+Whole-secret/raw mode; multi-secret discovery/merging;
 automatic refresh; cloud writes/IAM provisioning; deployment; shell execution; stdout or
 clipboard secret export; automatic login; Windows confidentiality guarantees; real data in
 fixtures; private reference-code redistribution.
+
+## Azure/GCP extension requirements
+
+Owner-authorized feature scope (2026-10-19); existing AWS commands stay compatible.
+
+| ID | Requirement | Acceptance criterion |
+| --- | --- | --- |
+| MC-01 | Require explicit provider selection: aws, azure, gcp. | Invalid provider/option combinations fail with usage exit 2 before SDK access. Shared preview/output/overwrite semantics stay unchanged. |
+| MC-02 | Azure needs --vault-url and secret name; optional --tenant-id selects the existing CLI tenant. | HTTPS public Azure Key Vault hosts only, no credentials/ports/query/extra path; one get_secret call using AzureCliCredential and the latest version. No login, resource discovery or writes. |
+| MC-03 | GCP needs --project and secret ID; credentials use ADC. | Exactly projects/PROJECT/secrets/SECRET/versions/latest is read with access_secret_version; UTF-8 and CRC32C validated before common JSON validation. No discovery, login, service-account key creation, or writes. |
+| MC-04 | SDK execution is isolated for every provider. | Existing deadline, bounded result pipe, suppressed SDK logs, fixed errors, and process termination apply; SDK constructors remain lazy. |
+| MC-05 | Share output security and failure behavior. | Every provider is tested through preview and export with synthetic content; malformed/oversized payloads and auth/permission/not-found/throttle/timeout failures disclose no values and preserve destination. |
+| MC-06 | Detailed manual test guides. | Separate Azure/GCP guides cover prerequisites, explicit targets, synthetic JSON creation, setup versus read-only IAM, CLI versus SDK auth, preview/pull, expected results, negative tests, troubleshooting, costs and non-automatic cleanup. |
+
+Azure public cloud only and latest global GCP secret versions are supported initially.
+Azure sovereign clouds, GCP regional secrets, arbitrary endpoints, and explicit version
+selection are deferred. Azure uses CLI credentials specifically, not an implicit fallback
+across environment/service identities. GCP ADC may use an existing configured identity;
+--project selects the resource and does not select the authenticated principal.
 
 ## Implementation decisions and remaining approval
 

@@ -13,6 +13,10 @@ Statuses: todo, in-progress, blocked, done. Done means the stated checks were ex
 | T-06L | P1 | done | Linux verification before public release | T-06; Linux environment | GitHub CI passed all 92 tests, Ruff, build and installed CLI help/version under Python 3.12–3.14 |
 | T-07 | P1 | done | Record owner-run AWS smoke verification | owner report | Owner stated estoe is working after their AWS pull; no values or identifying account/profile/selector information recorded; agent did not retrieve secrets |
 | T-08 | P1 | done | Publish GitHub AWS release | owner request; MIT selected | PR #1 merged as a6a2f3e; merged-main CI/audit passed; annotated v0.1.0 tag and wheel/source GitHub release published |
+| MC-01 | P0 | done | Azure/GCP adapters and provider-specific CLI validation | owner request | MC-01–MC-05 offline tests pass; AWS commands unchanged |
+| MC-02 | P0 | done | End-to-end manual setup/testing guides | MC-01 | Separate guides match actual flags/auth contracts; shell blocks syntax-checked only |
+| MC-03 | P1 | done | Local package/audit/security verification | MC-01, MC-02 | 171 offline macOS tests, Ruff, wheel/source build, installed help, dependency audit and sensitive-diff review passed; new Linux CI execution pending |
+| MC-04 | P1 | blocked | Owner-run Azure/GCP sandbox testing | owner setup/run approval | Follow guides using synthetic data and record pass/fail without identifiers or values |
 
 Release preparation: owner selected MIT. Version is 0.1.0; Linux CI now verifies built-wheel
 help, pull help, and version. Local macOS tests remain 92 passed. Dependency audit passed;
@@ -30,8 +34,8 @@ The release wheel/source archives were checked for dotenv/credential paths; none
 included. PyPI publication, remote rulesets/settings, and any additional live reads were
 not performed as part of this release.
 
-Azure/GCP adapters, raw mode, Windows ACL support, and multi-secret mapping are post-MVP
-candidates requiring separate requirements. GitHub push/release is authorized by the owner;
+Azure/GCP implementation is now owner-authorized development scope. Raw mode, Windows ACL
+support and multi-secret mapping remain future candidates. GitHub push/release was authorized for AWS v0.1;
 new live reads, cloud changes, and package-registry publication still need separate approval.
 
 ## Scaffold verification (2026-10-19)
@@ -54,3 +58,21 @@ No live AWS requests or secret writes were performed.
   are documented in SECURITY and ADR-004–006.
 - Linux was not executed: Docker is installed but its daemon is unavailable. Remote CI,
   live AWS tests, cloud changes, and publication have not been run. No live secret was fetched.
+
+## Azure/GCP development verification (2026-10-19)
+
+- Python 3.14.3/macOS: 171 offline tests passed, including all prior AWS tests; no live
+  Azure/GCP/AWS reads or credential login commands were executed.
+- Ruff format/lint, 0.2.0.dev0 source/wheel build, installed-wheel provider help, and locked
+  dependency audit passed. SDK client construction and GCP protobuf/checksum are checked
+  offline. Error canaries, provider routing, invalid flag/scope/endpoint rejection, preview,
+  private export and destination preservation have regression tests.
+- Both detailed guides' nine shell blocks passed bash syntax validation only. Cloud
+  account permissions, propagation, network access, costs and cleanup require owner-run
+  verification. The synthetic JSON fixture is checked by tests.
+- Review covered shared worker extraction, SDK logging/error suppression, explicit Azure
+  identity/URL constraints, GCP ADC resource scoping and CRC32C, plus unchanged filesystem
+  safeguards. Secret scan findings were synthetic selectors, fixed error text, and an
+  intentionally rejected fake userinfo URL; no live values are included.
+- This branch is prepared for local manual testing. New Linux CI, remote publication,
+  release tagging and PyPI upload were not performed in this implementation pass.
