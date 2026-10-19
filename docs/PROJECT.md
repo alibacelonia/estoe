@@ -5,7 +5,9 @@
 Local MVP implementation, 2026-10-19. Owner confirmed the name `estoe`,
 JSON-key expansion as default, `--profile`, useful `--help`, and SSD project location.
 Owner authorized feature implementation. Python/uv/argparse and macOS/Linux are used with
-the concrete encoding and filesystem decisions below; no live reads or publication are authorized.
+the concrete encoding and filesystem decisions below. No agent live reads or cloud changes
+are authorized. The AWS release is published; the owner approved pushing the multi-cloud
+branch and opening a PR only (not merging, tagging, or uploading packages).
 
 Developers should be able to retrieve one explicitly selected cloud secret and generate
 local configuration without manually copying values. Public examples must be fictional.
@@ -45,8 +47,10 @@ local configuration without manually copying values. Public examples must be fic
 | R-15 | Ship an installable CLI. | Built wheel installs in a fresh environment; help/version work outside the source tree; package checks, formatting, lint, offline tests, and dependency audit pass. |
 
 Implementation is verified through offline tests and local packaging. The owner reported
-a successful AWS pull on macOS; agent verification did not retrieve live secrets. Linux
-execution is a remote CI gate for this release.
+successful AWS pull and GCP pull/preview on macOS; agent verification did not retrieve live
+secrets. Azure is covered by offline tests only: the owner waived its live-test release
+gate after being informed that credentials, permissions and networking remain unverified.
+Linux execution is still a remote CI gate for this release.
 
 ## Out of scope
 

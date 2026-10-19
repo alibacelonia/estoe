@@ -51,5 +51,7 @@ volume settings are changed. Inherited ACLs and hostile same-user programs are n
 Tests use a fake provider and temporary paths, with network denied by default. CI covers
 Python 3.12–3.14 on Linux. macOS filesystem tests and installed-package checks were executed
 locally; the owner also reported a successful AWS pull. Remote Linux CI is a release gate.
-The new multi-cloud branch is verified offline locally; it needs Linux CI and owner-run
-Azure/GCP tests before a new release. See TESTING_AZURE.md and TESTING_GCP.md.
+The new multi-cloud branch is verified offline locally; it still needs Linux CI. The owner
+reported a successful GCP pull/preview and waived Azure live testing. Azure credentials,
+permissions and network access remain unverified against a real vault. The testing guides
+remain available for voluntary verification. No agent live reads were performed.

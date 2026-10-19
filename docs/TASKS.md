@@ -1,6 +1,7 @@
 # Tasks
 
-Statuses: todo, in-progress, blocked, done. Done means the stated checks were executed.
+Statuses: todo, in-progress, blocked, done, waived. Done means the stated checks were
+executed; waived is an explicit owner risk acceptance, not a passing check.
 
 | ID | Priority | Status | Task | Dependencies | Acceptance criteria |
 | --- | --- | --- | --- | --- | --- |
@@ -16,15 +17,15 @@ Statuses: todo, in-progress, blocked, done. Done means the stated checks were ex
 | MC-01 | P0 | done | Azure/GCP adapters and provider-specific CLI validation | owner request | MC-01–MC-05 offline tests pass; AWS commands unchanged |
 | MC-02 | P0 | done | End-to-end manual setup/testing guides | MC-01 | Separate guides match actual flags/auth contracts; shell blocks syntax-checked only |
 | MC-03 | P1 | done | Local package/audit/security verification | MC-01, MC-02 | 171 offline macOS tests, Ruff, wheel/source build, installed help, dependency audit and sensitive-diff review passed; new Linux CI execution pending |
-| MC-04 | P1 | blocked | Owner-run Azure/GCP sandbox testing | owner setup/run approval | Follow guides using synthetic data and record pass/fail without identifiers or values |
+| MC-04 | P1 | waived | Owner-run Azure/GCP sandbox testing | owner report/waiver | GCP pull/preview owner-reported successful; Azure live testing waived, not passed; no identifiers/values recorded |
 | RC-01 | P1 | done | Suppress SDK warnings as well as logging | owner release-readiness request | 81 provider tests passed; warning canaries stay off stdout/stderr on success/failure, including warnings-as-errors; filters restored; Ruff passed |
-| RC-02 | P1 | blocked | Complete Azure live smoke test | explicit target/read approval or owner-run result | Record synthetic preview/export result without identifiers or values; GCP pull/preview already owner-reported successful |
-| RC-03 | P1 | todo | Refresh beginner-friendly release documentation | RC-02 | README and related guides match tested behavior and distinguish released/development status |
-| RC-04 | P1 | blocked | Run multi-cloud Linux PR CI | branch push/PR approval | Python 3.12–3.14 CI and dependency audit pass before merge |
+| RC-02 | P1 | waived | Complete Azure live smoke test | explicit owner waiver | Owner chose to skip; no live Azure result claimed; GCP pull/preview owner-reported successful |
+| RC-03 | P1 | done | Refresh beginner-friendly release documentation | RC-02 | 37 documentation/CLI tests passed; shell syntax, local links, example options and sample output checked offline; Ruff passed |
+| RC-04 | P1 | todo | Run multi-cloud Linux PR CI | branch push/PR approved | Python 3.12–3.14 CI and dependency audit pass before merge; no merge/tag/upload authorized |
 | RC-05 | P1 | todo | Prepare stable 0.2.0 metadata/changelog | preceding release gates | Version, lockfile, package smoke and changelog agree; no tag/upload without approval |
 | RC-06 | P1 | todo | Improve safe validation feedback | owner UX request | Fixed actionable validation categories, no payload/key disclosure, preservation and CLI tests |
 
-Release preparation: owner selected MIT. Version is 0.1.0; Linux CI now verifies built-wheel
+Historical AWS release preparation: owner selected MIT. Version was 0.1.0; Linux CI verifies built-wheel
 help, pull help, and version. Local macOS tests remain 92 passed. Dependency audit passed;
 tracked-file secret scan findings were reviewed as fixed error text and synthetic fixtures.
 The owner-run AWS result is a smoke report, not exhaustive live-provider validation.
@@ -43,6 +44,8 @@ not performed as part of this release.
 Azure/GCP implementation is now owner-authorized development scope. Raw mode, Windows ACL
 support and multi-secret mapping remain future candidates. GitHub push/release was authorized for AWS v0.1;
 new live reads, cloud changes, and package-registry publication still need separate approval.
+The owner subsequently approved pushing the reviewed multi-cloud branch and opening a PR
+for Linux CI only. Merge, tag/release, PyPI upload and remote settings remain unauthorized.
 
 ## Scaffold verification (2026-10-19)
 
@@ -82,3 +85,14 @@ No live AWS requests or secret writes were performed.
   intentionally rejected fake userinfo URL; no live values are included.
 - This branch is prepared for local manual testing. New Linux CI, remote publication,
   release tagging and PyPI upload were not performed in this implementation pass.
+
+## Multi-cloud release readiness
+
+- Owner-reported GCP pull and preview succeeded on macOS. No values or real identifiers
+  are recorded. The owner waived live Azure testing; offline coverage is not a live pass.
+- README now separates the published AWS-only version from the multi-cloud checkout and
+  explains installation, login differences, JSON input, Git safety, preview, export and
+  consuming the file step by step. Related requirements, architecture and guides agree.
+- Documentation tests check shell syntax without executing cloud commands, local links,
+  literal CLI examples and the sample JSON-to-dotenv result. The focused documentation
+  and CLI suite passed 37 tests; Ruff lint/format and diff whitespace checks passed.

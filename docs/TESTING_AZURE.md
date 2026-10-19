@@ -1,5 +1,9 @@
 # Azure Key Vault: setup and manual estoe test
 
+Release status: Azure is tested offline. The owner waived live Azure validation for
+release preparation; no real-vault success is claimed. This optional guide remains
+available if you want to verify your own account, permissions and networking.
+
 These are instructions for you to review and run. They create resources and assign roles;
 estoe itself only reads. No Azure setup or live read was performed by the implementation
 agent. Use an authorized sandbox subscription. Azure resource and operation charges may apply.

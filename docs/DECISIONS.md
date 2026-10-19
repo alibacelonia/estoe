@@ -107,3 +107,13 @@
 - Consequences: successful reads remain successful with warnings configured as errors.
   Quota-project advice must stay discoverable in the GCP guide; this is not suppression of
   arbitrary native or external credential-helper output.
+
+## ADR-012: Waive Azure live validation without claiming a pass
+
+- Status: accepted by the owner for this release preparation.
+- Decision: proceed using the offline Azure adapter/CLI regression suite; the owner
+  explicitly chose to skip live Azure smoke testing. Record the successful owner-run GCP
+  pull/preview separately. Never treat a waiver or mocked test as live verification.
+- Consequences: real Azure credentials, tenant permissions, RBAC propagation and network
+  access remain unverified. Keep the sandbox guide available. Branch push and PR are
+  approved for Linux CI; merge, release/tag and PyPI upload are not authorized.

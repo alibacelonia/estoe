@@ -1,5 +1,9 @@
 # Google Secret Manager: setup and manual estoe test
 
+Verification status: the owner reported a successful GCP pull and key-only preview on
+macOS. No account/project identifiers or secret values are recorded here. Agent checks
+remain offline; this report is not exhaustive live-provider validation.
+
 These are instructions for you to review and run, not actions performed by the agent.
 Use an authorized sandbox project with billing configured. API enablement, secret creation,
 and IAM bindings modify cloud state. Secret storage/access can incur charges. estoe itself
@@ -154,6 +158,10 @@ files, ADC files, tokens, actual identifiers, or raw SDK response dumps in publi
 - Add `--profile sandbox`: usage error 2 before cloud access; AWS profiles do not select ADC.
 - `credentials`: run the ADC login step; check whether an environment override selected a
   different identity. Ordinary `gcloud auth login` alone is insufficient for Python SDK ADC.
+- Quota-project setup: even when a read succeeds, configure the ADC quota project in
+  step 5. estoe suppresses raw SDK warnings; their absence does not prove quota/billing
+  configuration is complete. Ask your administrator about Service Usage Consumer access
+  if `set-quota-project` fails. Do not change projects or permissions just to silence a warning.
 - `access_denied`: check ADC principal, secret-level Accessor binding, IAM propagation,
   enabled API, and quota-project service-usage permission. Viewer alone cannot read values.
 - `configuration`: check project/secret IDs and that the latest version is enabled. `latest`

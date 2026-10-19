@@ -1,14 +1,41 @@
 # estoe
 
-**Secret to Env.** Generate local `.env` files from cloud secret stores.
+**Secret to Env.** Turn one cloud secret into a local `.env` file without copying
+secret values by hand. The multi-cloud version supports AWS Secrets Manager,
+Azure Key Vault, and Google Secret Manager.
 
-Released: AWS v0.1.0. Development: v0.2.0.dev0 adds Azure Key Vault and Google Secret Manager.
-The owner reported a successful AWS pull on macOS; Azure/GCP live tests are pending.
-Automated tests use synthetic data.
+**Release status:** published GitHub release `v0.1.0` supports AWS only. This
+checkout is `0.2.0.dev0`, with Azure/GCP added. The owner reported successful AWS
+pull and GCP pull/preview on macOS. Azure has offline tests, but no live test;
+the owner waived that release gate. This is not verification of live Azure
+authentication, permissions, or networking. Linux CI is required before merging.
 
-## Installation
+## Before you start
 
-With Python 3.12+ and uv, install the tagged GitHub release:
+You need Python 3.12+, uv, Git, and macOS or Linux. Windows is not supported yet.
+macOS also needs the built-in `diskutil` command for file-safety checks.
+Your cloud identity must already have read access to the secret you select.
+
+The secret must contain a **JSON object whose values are all strings**:
+
+```json
+{"APP_MODE":"development","API_URL":"https://example.com","API_TOKEN":"synthetic-test-value"}
+```
+
+For that fictional example, estoe writes:
+
+```dotenv
+API_TOKEN="synthetic-test-value"
+API_URL="https://example.com"
+APP_MODE="development"
+```
+
+Never put real values in command arguments, Git, screenshots, or issue reports.
+estoe reads secrets; it does not create them or log you in.
+
+## 1. Install the version you want
+
+### Released version: AWS only
 
 ```bash
 uv tool install "git+https://github.com/alibacelonia/estoe.git@v0.1.0"
@@ -16,137 +43,185 @@ estoe --help
 estoe pull --help
 ```
 
-This release is distributed through GitHub; no PyPI publication is claimed.
+This installs the tagged GitHub release. No PyPI publication is claimed; do not
+assume `pip install estoe` installs this project.
 
-For Azure/GCP, use the development checkout and `uv sync --locked`, then `uv run estoe`.
-The v0.1.0 install command above remains AWS-only until the next release is published.
+### Multi-cloud development version: AWS, Azure, GCP
 
-## Local development
+Use the multi-cloud branch or its PR checkout:
 
-Python 3.12+, uv, Git, and macOS/Linux are required. macOS also needs diskutil (built in).
-Run from this directory:
+```bash
+git clone --branch feature/azure-gcp-providers https://github.com/alibacelonia/estoe.git
+cd estoe
+uv sync --locked
+uv run estoe --version
+uv run estoe pull --help
+```
+
+Run the examples below from that directory using `uv run estoe`. This selects the
+checkout, not an older globally installed `estoe`. The branch is development code,
+not a published stable release.
+
+## 2. Choose a provider and authenticate
+
+Replace the example resource names with your own authorized test resources.
+Never pass passwords or access tokens as flags.
+
+| Provider | Which login does estoe use? | Which resource options do I need? |
+| --- | --- | --- |
+| AWS | Existing credentials; optional `--profile sandbox` selects a named profile | `--secret` name/ARN; optional `--region` |
+| Azure | Existing Azure CLI (`az login`) session; optional `--tenant-id` selects a tenant | `--vault-url` and `--secret` name |
+| GCP | Application Default Credentials (ADC), not just a regular gcloud login | `--project` and `--secret` ID |
+
+For AWS SSO, refresh your existing session yourself with
+`aws sso login --profile sandbox` when needed. Without `--profile`, AWS uses its
+default credential chain. Without `--region`, the SDK/profile must supply one.
+GCP `--project` selects the secret's project, not the login identity or quota project.
+
+New to Azure or GCP? Start with the complete setup guides:
+
+- [Azure: create a synthetic secret, configure permissions, and test](docs/TESTING_AZURE.md)
+- [GCP: create a synthetic secret, configure ADC, and test](docs/TESTING_GCP.md)
+
+Those guides include resource creation and IAM changes for you to review and run.
+Cloud resources and reads may cost money. estoe never performs setup automatically.
+
+## 3. Check output safety, then preview
+
+Use an existing directory owned by you and not writable by other users. Inside a
+Git repository, add your destination to your own `.gitignore` first, for example
+`.env.local`. This repository already ignores `.env` and `.env.*`.
+Never use a tracked file for output.
+
+Choose **one** command for your provider:
+
+```bash
+# AWS
+uv run estoe pull --provider aws --secret example/dev/app \
+  --profile sandbox --region us-east-1 --output .env.local --preview
+
+# Azure
+uv run estoe pull --provider azure --secret estoe-test-app \
+  --vault-url https://example-vault.vault.azure.net/ --output .env.local --preview
+
+# GCP
+uv run estoe pull --provider gcp --secret estoe-test-app \
+  --project example-project --output .env.local --preview
+```
+
+For the fictional JSON above, preview prints only:
+
+```text
+Preview: 3 variable(s)
+API_TOKEN
+API_URL
+APP_MODE
+```
+
+Preview writes no file, but **does read the cloud secret** and may incur charges.
+It checks the selected output path too. Secret values are never printed by estoe.
+
+## 4. Write the file
+
+Run your chosen command again **without `--preview`**. For example:
+
+```bash
+uv run estoe pull --provider aws --secret example/dev/app \
+  --profile sandbox --region us-east-1 --output .env.local
+```
+
+Expected success for three variables:
+
+```text
+Wrote 3 variable(s) to the selected output (mode 0600).
+```
+
+Mode `0600` means only the owning user has POSIX read/write permissions. The file
+still contains plaintext secrets: keep it out of shared folders, backups, and sync
+tools where possible. Do not paste its contents into terminals or support tickets.
+
+If the file exists, estoe asks before replacing it in an interactive terminal.
+In scripts, deliberately pass `--overwrite` only when replacement is intended.
+`--preview` and `--overwrite` cannot be combined.
+
+## 5. Load the file in your application
+
+The supported consumer is **python-dotenv 1.x with interpolation disabled**.
+Install python-dotenv in your application's environment separately, then use:
+
+```python
+from dotenv import load_dotenv
+
+load_dotenv(".env.local", interpolate=False)
+```
+
+This keeps dollar expressions such as `${TOKEN}` literal. Other dotenv loaders
+may parse escapes differently. **Never execute or shell-source the file.**
+
+## Options and limits
+
+Run `uv run estoe pull --help` for all options. With the released installation,
+use `estoe pull --help` instead.
+
+- `--provider` is always required; there is no default provider.
+- `--output` defaults to `.env`. Provider-specific flags cannot be mixed.
+- `--allow-unignored` bypasses only the Git-ignore requirement. Prefer fixing your
+  ignore rule. Tracked files are always refused, even with this flag.
+- Outside a Git worktree, estoe warns that Git-ignore protection cannot be checked.
+- Keys match `[A-Za-z_][A-Za-z0-9_]*`; output is sorted and keys stay unchanged.
+  Empty strings work. Numbers must be quoted, for example `"PORT":"8000"`.
+- Duplicate keys, nesting, arrays, non-string values, binary secrets, NUL, and
+  invalid Unicode fail before writing. Content is capped at 64 KiB; encoded output
+  at 256 KiB. One secret is read per command; existing files are not merged.
+- Azure supports public-cloud vaults and the latest version only. GCP supports
+  global secrets and `versions/latest`, not regional secrets or custom endpoints.
+- Retrieval has a 15-second worker deadline plus startup/cleanup. AWS/Azure allow
+  at most two SDK attempts; GCP automatic API retries are disabled. Authentication
+  may make additional requests. Git/filesystem checks have separate short timeouts.
+
+## Troubleshooting
+
+Exit codes: `0` success, `2` invalid arguments, `1` operational failure. Errors are
+deliberately value-free; raw SDK warnings and exceptions are not shown.
+
+| Error | What to check |
+| --- | --- |
+| `invalid_content` | Use a nonempty flat JSON object of strings, not `KEY=value` text. See the example above. |
+| `credentials` | Refresh the correct login. GCP needs ADC; Azure needs Azure CLI. |
+| `access_denied` | Check this secret's read permission, identity, and IAM propagation; do not grant broad admin just to read. |
+| `not_found` | Check the secret name and selected vault/project/region. |
+| `filesystem` | On macOS, use an ownership-enforcing volume. estoe does not change volume settings. |
+| `unsafe_path` | Use an existing private directory without symlink components or hard-linked destination files. |
+| `tracked` / `unignored` | Choose an untracked destination and add your own ignore rule. |
+| `exists` | Review the existing file, then confirm replacement or deliberately use `--overwrite`. |
+| `timeout` / `throttled` | Check connectivity/quota and retry manually when appropriate. |
+
+On an external macOS drive with “Ignore ownership on this volume” enabled, choose
+`--output /absolute/path/on/a/private/volume/.env.local` instead. estoe never changes
+system settings. GCP quota-project setup is explained in the
+[GCP guide](docs/TESTING_GCP.md#7-negative-tests-and-troubleshooting).
+After an interrupt or error, check whether the destination already exists before
+retrying: a completed atomic write can survive an interruption immediately afterward.
+See [security boundaries](docs/SECURITY.md) for the full limitations.
+
+## Development and permissions
+
+From the checkout:
 
 ```bash
 uv sync --locked
-uv run estoe --help
-uv run estoe --version
-uv run estoe pull --help
 uv run ruff format --check .
 uv run ruff check .
 uv run pytest
 uv build
 ```
 
-To install the CLI locally from this checkout:
-
-```bash
-uv tool install .
-estoe --help
-estoe pull --help
-```
-
-## Usage
-
-```bash
-estoe pull --provider aws --secret example/dev/app --profile sandbox --region us-east-1
-estoe pull --provider aws --secret example/dev/app --profile sandbox --output .env.local
-estoe pull --provider aws --secret example/dev/app --preview
-```
-
-Development Azure/GCP examples (run from this checkout):
-
-```bash
-uv run estoe pull --provider azure --secret estoe-test-app \
-  --vault-url https://example-vault.vault.azure.net/ --output .env.azure
-uv run estoe pull --provider gcp --secret estoe-test-app \
-  --project example-project --output .env.gcp
-```
-
-| Provider | Authentication | Required resource options |
-| --- | --- | --- |
-| AWS | Default credential chain or `--profile` | `--secret`; optional `--region` |
-| Azure | Existing Azure CLI login; optional `--tenant-id` | `--vault-url`, `--secret` name |
-| GCP | Application Default Credentials (ADC) | `--project`, `--secret` ID |
-
-`--provider` is always required. AWS flags are rejected with Azure/GCP; vault/tenant flags
-are Azure-only, project is GCP-only. Azure uses the latest version in a public-cloud vault;
-GCP reads `projects/PROJECT/secrets/SECRET/versions/latest` and verifies CRC32C. Regional GCP
-secrets and Azure sovereign/custom endpoints are not supported. All use the same JSON
-contract and file safeguards. Shared flags: `--output`, `--preview`, `--overwrite`,
-`--allow-unignored`. No automatic login or secret discovery is performed.
-
-Follow the detailed guides to create synthetic secrets, set up read access, and test:
-
-- [Azure: vault creation through preview/export verification](docs/TESTING_AZURE.md)
-- [GCP: project/API setup through ADC and export verification](docs/TESTING_GCP.md)
-
-The commands in those guides create cloud resources and change IAM if you choose to run
-them. Review the targets/costs first; the implementation agent has not performed those steps.
-
-Each adapter expands one flat JSON secret's string values into separate dotenv variables,
-preserving key names. `--profile` selects existing named AWS credentials; when omitted the
-SDK default chain applies. `--region` overrides profile/SDK region configuration.
-Users manage credentials and SSO login themselves. No access keys are accepted as flags.
-
-Preview still fetches a secret and may incur cloud charges; it displays only key names and
-counts. It performs the same output-path checks as a normal pull. Values are never printed.
-
-The output defaults to `.env`; use `--output .env.local` to change it. An existing file requires
-interactive confirmation or `--overwrite`. Tracked files are always refused. Unignored files
-inside Git are refused unless you pass `--allow-unignored`; prefer adding your own ignore rule.
-Outside a Git worktree, a warning explains that ignore protection cannot be checked.
-
-The output directory must already exist, be owned by you, and not be group/world writable.
-Symlink components, special files, and hard-linked destinations are rejected. Files are
-created with POSIX mode 0600. macOS volumes must enforce ownership: the CLI refuses volumes
-with "Ignore ownership on this volume" enabled. You can keep this project on the SSD and
-use `--output /absolute/path/on/a/private/volume/.env` for generated secrets. The CLI never
-changes mount settings. See [security boundaries](docs/SECURITY.md).
-
-## Credentials and IAM
-
-Configure credentials yourself using the AWS credential chain, for example a named profile
-and an existing SSO session (`aws sso login --profile sandbox`, if applicable). estoe does
-not log in, modify credentials, list secrets, or create resources. Explicit `--profile` and
-`--region` select the boto3 session; omitted values follow SDK configuration.
-
-Grant `secretsmanager:GetSecretValue` on only the intended secret ARN. For a customer-managed
-KMS key, also authorize `kms:Decrypt` on that key as required by its policy. Placeholder-only
-examples live in [docs/iam](docs/iam/). Use an authorized account; each pull, including preview,
-can incur Secrets Manager/KMS charges and leaves a normal AWS audit event.
-
-## Secret content and dotenv format
-
-The selected SecretString must be a nonempty flat JSON object of strings:
-
-```json
-{"APP_MODE":"development","SERVICE_URL":"https://example.com","EMPTY":""}
-```
-
-Keys match `[A-Za-z_][A-Za-z0-9_]*` and remain unchanged. Output keys are sorted. Duplicate
-keys, nesting, arrays, non-string values, binary secrets, NUL, and invalid Unicode fail
-without replacing output. Secret content is capped at 64 KiB; output at 256 KiB.
-
-The format is tested with **python-dotenv 1.x, with interpolation disabled**. In the consuming
-Python application, install python-dotenv and load explicitly:
-
-```python
-from dotenv import load_dotenv
-
-load_dotenv(".env", interpolate=False)
-```
-
-This preserves literal `${...}` expressions and escaped multiline content. Other dotenv
-loaders may behave differently. Never execute or shell-source the file; keep plaintext
-secrets out of Git, shared directories, backups, and synchronization tools where possible.
-
-SDK retrieval is bounded by a 15-second worker deadline plus process startup/cleanup, with
-at most 2 SDK attempts for AWS/Azure; GCP automatic API retries are disabled (one explicit
-access call). Authentication may perform additional requests. Git and filesystem checks
-have separate short timeouts. Operational
-failures exit 1 with a fixed error code/message, argument errors exit 2, and success exits 0.
-After interruption or an error, inspect the selected destination before retrying: a completed
-atomic publication can survive an interruption immediately afterward.
+Automated tests use synthetic data and deny network access. Azure's live-test gate
+was waived, not passed. Its guide remains available for voluntary sandbox testing.
+AWS needs `secretsmanager:GetSecretValue` on the intended secret; a customer-managed
+KMS key may also need `kms:Decrypt` on that key. See the [IAM examples](docs/iam/).
+Azure/GCP least-privilege roles are in their setup guides. No telemetry, secret cache,
+automatic login, or secret discovery is used.
 
 ## Project documents
 
@@ -157,7 +232,8 @@ atomic publication can survive an interruption immediately afterward.
 - [Security](docs/SECURITY.md)
 - [Changelog](docs/CHANGELOG.md)
 
-Source and release artifacts: [alibacelonia/estoe](https://github.com/alibacelonia/estoe).
+Source, issues, and release artifacts: [alibacelonia/estoe](https://github.com/alibacelonia/estoe).
+A PyPI link will be added only after publication.
 
 ## License
 
