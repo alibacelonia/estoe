@@ -10,7 +10,7 @@ Statuses: todo, in-progress, blocked, done. Done means the stated checks were ex
 | T-04 | P0 | done | Git/destination safety and atomic writer | T-02 | R-08–R-10 tests cover permissions, failure, symlinks, observed changes, cooperative lock, atomic create non-clobber, Git tracking/ignores and disabled macOS ownership |
 | T-05 | P0 | done | AWS read adapter and export use case | T-03, T-04 | R-01–R-03, R-07, R-11–R-14 pass with stub clients and no live reads |
 | T-06 | P1 | done | Local install/package and security review | T-05 | macOS tests/build/installed-wheel smoke/audit pass; review and residual limits recorded below |
-| T-06L | P1 | todo | Linux verification before public release | T-06; Linux environment | Run full tests, packaging and installed help under Linux; CI definitions prepared but no remote configured |
+| T-06L | P1 | done | Linux verification before public release | T-06; Linux environment | GitHub CI passed all 92 tests, Ruff, build and installed CLI help/version under Python 3.12–3.14 |
 | T-07 | P1 | done | Record owner-run AWS smoke verification | owner report | Owner stated estoe is working after their AWS pull; no values or identifying account/profile/selector information recorded; agent did not retrieve secrets |
 | T-08 | P1 | in-progress | Publish GitHub AWS release | owner request; license | Reviewed commits, green remote checks, version tag, GitHub release; PyPI publication is separate |
 
@@ -18,6 +18,10 @@ Release preparation: owner selected MIT. Version is 0.1.0; Linux CI now verifies
 help, pull help, and version. Local macOS tests remain 92 passed. Dependency audit passed;
 tracked-file secret scan findings were reviewed as fixed error text and synthetic fixtures.
 The owner-run AWS result is a smoke report, not exhaustive live-provider validation.
+
+Linux release verification: [PR CI run](https://github.com/alibacelonia/estoe/actions/runs/39220646870)
+passed all three Python versions; [dependency audit](https://github.com/alibacelonia/estoe/actions/runs/39220646924)
+passed. Public source is delivered through PR #1, preserving the local implementation commits.
 
 Azure/GCP adapters, raw mode, Windows ACL support, and multi-secret mapping are post-MVP
 candidates requiring separate requirements. GitHub push/release is authorized by the owner;
