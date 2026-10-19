@@ -16,5 +16,5 @@ before implementation. Stop and report conflicting requirements.
 - Keep CLI, use case, providers, encoding, Git checks, and filesystem operations separate.
 - No arbitrary shell execution, telemetry, secret cache, or unsolicited AWS discovery.
 
-Current authorization: requirements, local scaffold, verification, and local commits.
-Application pull implementation follows approval of the pending design decisions.
+Current authorization includes application implementation and local commits (owner request).
+Live secrets, cloud changes, and publication still require separate approval.
