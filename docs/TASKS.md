@@ -12,7 +12,7 @@ Statuses: todo, in-progress, blocked, done. Done means the stated checks were ex
 | T-06 | P1 | done | Local install/package and security review | T-05 | macOS tests/build/installed-wheel smoke/audit pass; review and residual limits recorded below |
 | T-06L | P1 | done | Linux verification before public release | T-06; Linux environment | GitHub CI passed all 92 tests, Ruff, build and installed CLI help/version under Python 3.12–3.14 |
 | T-07 | P1 | done | Record owner-run AWS smoke verification | owner report | Owner stated estoe is working after their AWS pull; no values or identifying account/profile/selector information recorded; agent did not retrieve secrets |
-| T-08 | P1 | in-progress | Publish GitHub AWS release | owner request; license | Reviewed commits, green remote checks, version tag, GitHub release; PyPI publication is separate |
+| T-08 | P1 | done | Publish GitHub AWS release | owner request; MIT selected | PR #1 merged as a6a2f3e; merged-main CI/audit passed; annotated v0.1.0 tag and wheel/source GitHub release published |
 
 Release preparation: owner selected MIT. Version is 0.1.0; Linux CI now verifies built-wheel
 help, pull help, and version. Local macOS tests remain 92 passed. Dependency audit passed;
@@ -22,6 +22,13 @@ The owner-run AWS result is a smoke report, not exhaustive live-provider validat
 Linux release verification: [PR CI run](https://github.com/alibacelonia/estoe/actions/runs/39220646870)
 passed all three Python versions; [dependency audit](https://github.com/alibacelonia/estoe/actions/runs/39220646924)
 passed. Public source is delivered through PR #1, preserving the local implementation commits.
+
+AWS release complete: [v0.1.0](https://github.com/alibacelonia/estoe/releases/tag/v0.1.0).
+[Merged-main CI](https://github.com/alibacelonia/estoe/actions/runs/39220829200) and
+[audit](https://github.com/alibacelonia/estoe/actions/runs/39220829168) passed before tagging.
+The release wheel/source archives were checked for dotenv/credential paths; none were
+included. PyPI publication, remote rulesets/settings, and any additional live reads were
+not performed as part of this release.
 
 Azure/GCP adapters, raw mode, Windows ACL support, and multi-secret mapping are post-MVP
 candidates requiring separate requirements. GitHub push/release is authorized by the owner;
