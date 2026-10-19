@@ -1,0 +1,19 @@
+project:
+  name: estoe
+  description: "Secret to Env — generate local dotenv files from cloud secrets"
+  type: cli
+  stage: requirements-and-scaffold
+stack:
+  language: python
+  python: ">=3.12"
+  cli: argparse
+  package_manager: uv
+providers:
+  mvp: aws-secrets-manager
+  future: [azure-key-vault, google-secret-manager]
+constraints:
+  offline_tests: true
+  no_secret_logging: true
+  supported_platforms: [macos, linux]
+  live_reads_require_owner_approval: true
+  remote_publication_requires_owner_approval: true
