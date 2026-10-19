@@ -51,3 +51,13 @@
   closed if false/unknown. Check parent ownership/writability and actual temp-file mode.
 - Consequences: source code can stay on the SSD while output goes to an ownership-enforcing
   filesystem. Enabling volume ownership is a separate owner-approved system operation.
+
+## ADR-007: Publish AWS v0.1 through GitHub under MIT
+
+- Status: accepted; owner requested the release/push and explicitly selected MIT.
+- Decision: publish source and built wheel/source archives on GitHub, using a feature PR
+  with Linux Python 3.12–3.14 checks before the v0.1.0 tag. Package-registry publication is
+  separate; no PyPI upload credentials or trusted publisher are configured.
+- Consequences: installation is available from the tagged GitHub URL or wheel, while
+  `pip install estoe` from PyPI is not advertised. Account/profile/selector details and
+  generated dotenv content are excluded from commits and release notes.

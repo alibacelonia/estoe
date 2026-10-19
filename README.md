@@ -2,8 +2,20 @@
 
 **Secret to Env.** Generate local `.env` files from cloud secret stores.
 
-Status: local AWS MVP implemented and tested offline. Live AWS verification and public
-publication are pending. Azure Key Vault and Google Secret Manager are future adapters.
+AWS v0.1.0. Azure Key Vault and Google Secret Manager are future adapters.
+The owner reported a successful AWS pull on macOS; automated tests use synthetic data.
+
+## Installation
+
+With Python 3.12+ and uv, install the tagged GitHub release:
+
+```bash
+uv tool install "git+https://github.com/alibacelonia/estoe.git@v0.1.0"
+estoe --help
+estoe pull --help
+```
+
+This release is distributed through GitHub; no PyPI publication is claimed.
 
 ## Local development
 
@@ -109,5 +121,8 @@ atomic publication can survive an interruption immediately afterward.
 - [Security](docs/SECURITY.md)
 - [Changelog](docs/CHANGELOG.md)
 
-There is no remote repository or public package created yet. License is pending owner
-confirmation; choose one before publication.
+Source and release artifacts: [alibacelonia/estoe](https://github.com/alibacelonia/estoe).
+
+## License
+
+[MIT](LICENSE).

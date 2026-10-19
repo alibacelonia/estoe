@@ -4,11 +4,17 @@ build-backend = "hatchling.build"
 
 [project]
 name = "estoe"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Secret to Env — generate local dotenv files from cloud secrets"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dependencies = ["boto3>=1.37,<2"]
+
+[project.urls]
+Repository = "https://github.com/alibacelonia/estoe"
+Issues = "https://github.com/alibacelonia/estoe/issues"
 
 [project.scripts]
 estoe = "estoe.cli:main"

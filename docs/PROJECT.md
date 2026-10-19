@@ -44,8 +44,9 @@ local configuration without manually copying values. Public examples must be fic
 | R-14 | Document least privilege. | IAM examples use placeholder exact secret ARN with GetSecretValue; optional KMS Decrypt scoped to a customer-managed key. No credentials or real identifiers in examples. |
 | R-15 | Ship an installable CLI. | Built wheel installs in a fresh environment; help/version work outside the source tree; package checks, formatting, lint, offline tests, and dependency audit pass. |
 
-Implementation is verified through offline tests and local packaging. Live AWS behavior
-and Linux execution are not claimed as executed verification until explicitly run.
+Implementation is verified through offline tests and local packaging. The owner reported
+a successful AWS pull on macOS; agent verification did not retrieve live secrets. Linux
+execution is a remote CI gate for this release.
 
 ## Out of scope
 
@@ -67,7 +68,7 @@ diskutil must confirm ownership enforcement. The SSD may store the project even 
 ownership is disabled, but secret output must use another ownership-enforcing volume.
 Git and diskutil (macOS) are required for preflight. No system setting is changed automatically.
 
-Select a license before public publication (MIT is a candidate, not yet selected).
+MIT license was explicitly selected by the owner for the public release.
 
 ## Authorization boundary
 

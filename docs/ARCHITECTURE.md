@@ -40,4 +40,5 @@ On macOS diskutil confirms ownership enforcement; unsupported volumes fail close
 volume settings are changed. Inherited ACLs and hostile same-user programs are not covered.
 
 Tests use a fake provider and temporary paths, with network denied by default. CI covers
-Python 3.12–3.14 on Linux; macOS filesystem behavior must be verified before release.
+Python 3.12–3.14 on Linux. macOS filesystem tests and installed-package checks were executed
+locally; the owner also reported a successful AWS pull. Remote Linux CI is a release gate.

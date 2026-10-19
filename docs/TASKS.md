@@ -11,11 +11,17 @@ Statuses: todo, in-progress, blocked, done. Done means the stated checks were ex
 | T-05 | P0 | done | AWS read adapter and export use case | T-03, T-04 | R-01–R-03, R-07, R-11–R-14 pass with stub clients and no live reads |
 | T-06 | P1 | done | Local install/package and security review | T-05 | macOS tests/build/installed-wheel smoke/audit pass; review and residual limits recorded below |
 | T-06L | P1 | todo | Linux verification before public release | T-06; Linux environment | Run full tests, packaging and installed help under Linux; CI definitions prepared but no remote configured |
-| T-07 | P1 | blocked | Synthetic sandbox live test | T-06; run approval | Owner authorizes exact secret/account/run bounds; safe result, no values committed/logged |
-| T-08 | P1 | blocked | Create public repository/package and release | owner approval; license | Reviewed commits, green remote checks, ruleset, version tag, release |
+| T-07 | P1 | done | Record owner-run AWS smoke verification | owner report | Owner stated estoe is working after their AWS pull; no values or identifying account/profile/selector information recorded; agent did not retrieve secrets |
+| T-08 | P1 | in-progress | Publish GitHub AWS release | owner request; license | Reviewed commits, green remote checks, version tag, GitHub release; PyPI publication is separate |
+
+Release preparation: owner selected MIT. Version is 0.1.0; Linux CI now verifies built-wheel
+help, pull help, and version. Local macOS tests remain 92 passed. Dependency audit passed;
+tracked-file secret scan findings were reviewed as fixed error text and synthetic fixtures.
+The owner-run AWS result is a smoke report, not exhaustive live-provider validation.
 
 Azure/GCP adapters, raw mode, Windows ACL support, and multi-secret mapping are post-MVP
-candidates requiring separate requirements. No cloud or remote actions are authorized now.
+candidates requiring separate requirements. GitHub push/release is authorized by the owner;
+new live reads, cloud changes, and package-registry publication still need separate approval.
 
 ## Scaffold verification (2026-10-19)
 

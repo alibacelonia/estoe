@@ -1,7 +1,8 @@
 # Security posture
 
-The AWS implementation is tested offline. No live secrets have been retrieved during
-development verification, and no remote repository/package has been published.
+Automated verification uses offline synthetic tests. The owner reported a successful
+AWS pull on macOS. The agent did not retrieve live secrets; the owner-run result is not a
+claim of exhaustive live validation. GitHub distributes this release; PyPI is not configured.
 
 Use existing credentials/SSO. No command-line credential flags, telemetry, raw errors, secret
 logging, caches, clipboard output, or automatic shell sourcing are implemented. Output `.env`
@@ -17,10 +18,9 @@ Tests cover encoding with interpolation disabled, permissions, symlinks, observe
 changes, atomic create-only non-clobber, Git checks, diagnostics canaries, and failure cleanup.
 Review evidence in TASKS; tests are not a formal proof of confidentiality.
 
-On macOS, diskutil must confirm ownership enforcement on the destination mount. The current
-development SSD has ownership disabled and is therefore rejected for secret output. The CLI
-does not enable ownership or change system settings. Install/run source from the SSD and
-choose a private ownership-enforcing output directory instead.
+On macOS, diskutil must confirm ownership enforcement on the destination mount. Volumes
+with ownership disabled are rejected for secret output. The CLI does not enable ownership
+or change system settings. Use an ownership-enforcing output directory.
 
 The parent must be owned by the caller, with no group/world write bits. A pinned directory
 descriptor prevents symlink redirection; file identity/content metadata is checked before
@@ -42,4 +42,8 @@ customer-managed key if needed. See placeholder policies in `docs/iam/`. No clou
 operation exists. Logs/CloudTrail may include secret selector metadata on AWS's side;
 avoid sensitive information in resource names and command history.
 
-License and a private vulnerability-reporting channel must be selected before publication.
+## Reporting vulnerabilities
+
+Do not include secret values, generated dotenv files, or credentials in public issues.
+Use GitHub private vulnerability reporting when enabled in the repository's Security tab.
+If it is unavailable, contact the maintainer privately rather than posting sensitive details.
