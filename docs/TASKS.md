@@ -25,6 +25,9 @@ executed; waived is an explicit owner risk acceptance, not a passing check.
 | RC-05 | P1 | done | Prepare stable 0.2.0 metadata/changelog | preceding release gates | 38 focused tests, Ruff and fresh-environment wheel help/version passed; source/wheel inventories reviewed; version/lock/CI/docs agree; not published |
 | RC-06 | P1 | done | Improve safe validation feedback | owner UX request | 94 focused UX/CLI/docs tests and full 207-test offline suite passed; Ruff passed; fixed advice retains invalid_content, no offending key/value echo, all-provider output preservation |
 | GOV-01 | P1 | done | Protect remote main using an active ruleset | explicit owner request | Remote state verified protected with exact main scope and all requested controls; six focused tests, Ruff and whitespace checks passed; JSON is a reference, not automatic sync |
+| PUB-01 | P1 | done | Prepare and test PyPI CI/delivery and public links | owner request | 229 offline tests, Ruff, actionlint, Twine 7 metadata checks, installed-wheel smoke and locked audit passed before commit; workflow/release boundaries reviewed; no actual publication |
+| PUB-02 | P1 | blocked | Configure PyPI Trusted Publisher and approval environment | owner account/setup actions | Exact owner/repo/workflow/environment binding, required reviewer/tag restrictions and explicit repository enable variable; no secrets in Git |
+| PUB-03 | P1 | blocked | First approved PyPI release and registry install verification | PUB-01 merged; PUB-02; explicit owner release approval | Stable tag/version/main checks pass, owner approves publish, registry metadata/version/installation verified before README claims publication |
 
 Historical AWS release preparation: owner selected MIT. Version was 0.1.0; Linux CI verifies built-wheel
 help, pull help, and version. Local macOS tests remain 92 passed. Dependency audit passed;
@@ -131,3 +134,27 @@ No live AWS requests or secret writes were performed.
   or deletion was used to verify protection, and no PR was merged or release published.
 - Six focused configuration/documentation tests, Ruff lint/format and diff whitespace
   checks passed. Changes stay on the existing feature branch/PR, not directly on main.
+
+## PyPI automation preparation
+
+- Owner requested workflow implementation, public package/repository links, tests before
+  commit and a new PR. Work branches from merged main; no direct main push or new merge.
+- PyPI page returned 404 during preparation; README labels its link as pending first
+  publication and package metadata contains the GitHub repository/issue/docs/changelog links.
+  No PyPI ownership or availability reservation is implied by this check.
+- New release workflow reuses tests/audit, validates stable tag/version/main ancestry,
+  builds distributions, checks metadata and smokes one installed wheel outside source.
+  PR/manual runs cannot upload. Publishing requires the enable variable, stable release
+  and owner-configured environment/publisher. No API token is stored; the upload job has
+  OIDC permission and runs no project source. External action references are pinned.
+- Initial local checks: 229 offline tests, Ruff and actionlint 1.7.12 passed. The first
+  strict package check exposed Twine 6.2 rejecting Core Metadata 2.5; updated the workflow
+  to Twine 7.0.0 (also used by the pinned publisher action), then wheel/source checks and
+  isolated help/version smoke passed. Locked dependency audit found no known vulnerabilities.
+- PyPI/TestPyPI uploads, pending publisher registration, approval-environment configuration,
+  repository enable variable, tags/releases and post-upload installation remain unexecuted.
+- Final local verification repeated the full 229-test suite and package checks successfully
+  after the Twine compatibility fix. Reviewed actual wheel Project-URL fields (including
+  Repository and PyPI), source inventory, YAML conditions and permissions, tokenless upload
+  action compatibility, and staged changes for sensitive content. No release blocker was
+  found in this preparation; real OIDC/upload execution still requires owner setup/approval.

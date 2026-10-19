@@ -117,3 +117,17 @@
 - Consequences: real Azure credentials, tenant permissions, RBAC propagation and network
   access remain unverified. Keep the sandbox guide available. Branch push and PR are
   approved for Linux CI; merge, release/tag and PyPI upload are not authorized.
+
+## ADR-013: Tokenless, explicitly enabled PyPI release workflow
+
+- Status: accepted for owner-requested workflow preparation, not an actual upload.
+- Decision: reuse tests/audit, validate tag/version/main ancestry, build and inspect the
+  distributions, and publish only immutable artifacts in a separate OIDC-enabled job.
+  Require a stable published GitHub release, explicit repository enable variable and
+  an owner-configured pypi approval environment. PRs/manual runs cannot upload. Pin the
+  new workflow's external actions to reviewed commit SHAs and never store PyPI tokens.
+- Consequences: registry account/pending publisher, environment reviewers/tag restrictions
+  and enablement must be configured by the owner before the first release. No TestPyPI
+  upload path or registry mutation is included. Pending PyPI links are explicitly labeled;
+  project URLs in wheel metadata let PyPI link back to the public repository. Environment
+  protection is a remote setting, not something a YAML environment name guarantees.

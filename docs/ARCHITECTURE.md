@@ -55,7 +55,20 @@ volume settings are changed. Inherited ACLs and hostile same-user programs are n
 Tests use a fake provider and temporary paths, with network denied by default. CI covers
 Python 3.12–3.14 on Linux. macOS filesystem tests and installed-package checks were executed
 locally; the owner also reported a successful AWS pull. Remote Linux CI is a release gate.
-The new multi-cloud branch is verified offline locally; it still needs Linux CI. The owner
+The multi-cloud PR was merged and its post-merge Linux CI/audit passed. The owner
 reported a successful GCP pull/preview and waived Azure live testing. Azure credentials,
 permissions and network access remain unverified against a real vault. The testing guides
 remain available for voluntary verification. No agent live reads were performed.
+
+## Package delivery boundary
+
+`ci.yml` and `dependency-audit.yml` are reusable by `publish-pypi.yml` while keeping their
+existing triggers/check names for main protection. PR/manual publishing-workflow runs are
+validation-only. A stable release validates its tag/version, checkout and origin/main
+ancestry with a read-only standard-library script. The build job checks Twine metadata,
+smokes the exact current wheel outside source, and uploads immutable per-run artifacts.
+The upload job downloads only those artifacts, has OIDC permission only, runs no project
+source, and uses PyPA Trusted Publishing. It requires a stable published release in this
+repository plus an explicit enable variable and the owner-configured pypi environment.
+The YAML does not configure environment reviewers or the PyPI account; those remain manual
+prerequisites. End-to-end publishing requires separate approval and remains unexecuted.

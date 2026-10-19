@@ -2,6 +2,12 @@
 
 ## Unreleased — 0.2.0 (prepared, not published)
 
+- Prepared release-gated PyPI Trusted Publishing workflow with reusable CI/audit, stable
+  tag/version/main ancestry guard, strict metadata checks and isolated wheel smoke.
+  Upload is disabled until owner setup/enablement and release approval. No upload performed.
+- Added a beginner-friendly publishing guide, pending PyPI link in README, and package
+  project URLs for GitHub repository, issues, documentation, changelog and PyPI.
+
 - Azure Key Vault reader using the existing Azure CLI identity, required vault URL,
   optional tenant UUID, latest-version reads, endpoint validation and safe errors.
 - GCP Secret Manager reader using ADC, explicit project/secret ID, latest-version reads
