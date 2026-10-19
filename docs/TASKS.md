@@ -21,8 +21,8 @@ executed; waived is an explicit owner risk acceptance, not a passing check.
 | RC-01 | P1 | done | Suppress SDK warnings as well as logging | owner release-readiness request | 81 provider tests passed; warning canaries stay off stdout/stderr on success/failure, including warnings-as-errors; filters restored; Ruff passed |
 | RC-02 | P1 | waived | Complete Azure live smoke test | explicit owner waiver | Owner chose to skip; no live Azure result claimed; GCP pull/preview owner-reported successful |
 | RC-03 | P1 | done | Refresh beginner-friendly release documentation | RC-02 | 37 documentation/CLI tests passed; shell syntax, local links, example options and sample output checked offline; Ruff passed |
-| RC-04 | P1 | todo | Run multi-cloud Linux PR CI | branch push/PR approved | Python 3.12–3.14 CI and dependency audit pass before merge; no merge/tag/upload authorized |
-| RC-05 | P1 | todo | Prepare stable 0.2.0 metadata/changelog | preceding release gates | Version, lockfile, package smoke and changelog agree; no tag/upload without approval |
+| RC-04 | P1 | done | Run multi-cloud Linux PR CI | branch push/PR approved | PR #3 initial revision 0d6608c passed Linux Python 3.12–3.14 CI and dependency audit; later commits must pass again; no merge/tag/upload authorized |
+| RC-05 | P1 | done | Prepare stable 0.2.0 metadata/changelog | preceding release gates | 38 focused tests, Ruff and fresh-environment wheel help/version passed; source/wheel inventories reviewed; version/lock/CI/docs agree; not published |
 | RC-06 | P1 | todo | Improve safe validation feedback | owner UX request | Fixed actionable validation categories, no payload/key disclosure, preservation and CLI tests |
 
 Historical AWS release preparation: owner selected MIT. Version was 0.1.0; Linux CI verifies built-wheel
@@ -96,3 +96,13 @@ No live AWS requests or secret writes were performed.
 - Documentation tests check shell syntax without executing cloud commands, local links,
   literal CLI examples and the sample JSON-to-dotenv result. The focused documentation
   and CLI suite passed 37 tests; Ruff lint/format and diff whitespace checks passed.
+- [PR #3](https://github.com/alibacelonia/estoe/pull/3) was opened with approval. Initial
+  revision 0d6608c passed [Linux CI](https://github.com/alibacelonia/estoe/actions/runs/39241912207)
+  on Python 3.12–3.14 and [dependency audit](https://github.com/alibacelonia/estoe/actions/runs/39241912214).
+  No merge or release was performed. Recheck the final revision after subsequent changes.
+- Prepared 0.2.0 metadata, lockfile, CI wheel paths and unreleased changelog. All 38 focused
+  documentation/CLI tests, Ruff and whitespace checks passed. Built the wheel and source
+  archive in a temporary directory, installed the wheel with cached dependencies in a
+  fresh virtual environment, and ran help/pull-help/version outside the source tree.
+  Reviewed both archive inventories: no generated dotenv files, credentials or key files.
+  This is package preparation, not a published release.

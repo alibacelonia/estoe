@@ -376,7 +376,7 @@ wheels = [
 
 [[package]]
 name = "estoe"
-version = "0.2.0.dev0"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "azure-identity" },

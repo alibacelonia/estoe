@@ -5,6 +5,8 @@ import json
 import re
 import shlex
 import subprocess
+import tomllib
+from importlib.metadata import version
 from pathlib import Path
 
 import pytest
@@ -49,3 +51,18 @@ def test_readme_json_example_matches_shown_dotenv():
     example = re.search(r"```json\n(.*?)```", content, re.DOTALL).group(1)
     expected = re.search(r"```dotenv\n(.*?)```", content, re.DOTALL).group(1)
     assert encode_env(parse_secret(example)).decode() == expected
+
+
+def test_prepared_version_matches_installation_lock_ci_and_guides():
+    expected = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"]
+    assert version("estoe") == expected
+    lock = tomllib.loads((ROOT / "uv.lock").read_text())
+    assert (
+        next(package["version"] for package in lock["package"] if package["name"] == "estoe")
+        == expected
+    )
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text()
+    assert workflow.count(f"estoe-{expected}-py3-none-any.whl") == 3
+    for path in GUIDES:
+        assert f"`{expected}`" in path.read_text()
+    assert f"Unreleased — {expected}" in (ROOT / "docs/CHANGELOG.md").read_text()

@@ -21,7 +21,7 @@ uv run estoe --version
 uv run estoe pull --help
 ```
 
-Expect version `0.2.0.dev0` and `azure` among provider choices. The published AWS v0.1.0
+Expect version `0.2.0` (prepared, not published) and `azure` among provider choices. The published AWS v0.1.0
 does not have this feature. Use `uv run estoe` throughout to select the checkout version.
 
 Install the Azure CLI using Microsoft's [installation instructions](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli),

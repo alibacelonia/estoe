@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — 0.2.0.dev0
+## Unreleased — 0.2.0 (prepared, not published)
 
 - Azure Key Vault reader using the existing Azure CLI identity, required vault URL,
   optional tenant UUID, latest-version reads, endpoint validation and safe errors.
@@ -10,6 +10,14 @@
   CLI options are rejected. AWS commands remain compatible and provider remains required.
 - Detailed Azure/GCP synthetic-secret provisioning, IAM/authentication and manual testing
   guides, plus a fictional JSON fixture. No cloud setup or live reads performed by the agent.
+- Suppress Python SDK warnings as well as logging during isolated reads, including when
+  the environment treats warnings as errors.
+- Beginner-friendly README covering provider login differences, JSON input, safe preview,
+  private output, application loading and troubleshooting; offline documentation checks.
+- Owner reported successful GCP pull/preview on macOS. Azure live validation was explicitly
+  waived, not passed; actual Azure credentials, permissions and networking remain unverified.
+- Version metadata is prepared for 0.2.0. The published release remains AWS-only v0.1.0;
+  no new Git tag, GitHub release or PyPI upload has been created.
 
 ## 0.1.0 — 2026-10-19
 

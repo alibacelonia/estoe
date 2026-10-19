@@ -5,10 +5,11 @@ secret values by hand. The multi-cloud version supports AWS Secrets Manager,
 Azure Key Vault, and Google Secret Manager.
 
 **Release status:** published GitHub release `v0.1.0` supports AWS only. This
-checkout is `0.2.0.dev0`, with Azure/GCP added. The owner reported successful AWS
+checkout prepares `0.2.0` (not yet published), with Azure/GCP added. The owner reported successful AWS
 pull and GCP pull/preview on macOS. Azure has offline tests, but no live test;
 the owner waived that release gate. This is not verification of live Azure
-authentication, permissions, or networking. Linux CI is required before merging.
+authentication, permissions, or networking. Linux CI passed the initial multi-cloud
+PR revision on Python 3.12–3.14; subsequent changes must pass again before merging.
 
 ## Before you start
 
