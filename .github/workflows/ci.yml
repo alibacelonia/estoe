@@ -21,6 +21,6 @@ jobs:
       - run: uv run ruff check .
       - run: uv run pytest
       - run: uv build
-      - run: uvx --from ./dist/estoe-0.1.0-py3-none-any.whl estoe --help
-      - run: uvx --from ./dist/estoe-0.1.0-py3-none-any.whl estoe pull --help
-      - run: uvx --from ./dist/estoe-0.1.0-py3-none-any.whl estoe --version
+      - run: uvx --from ./dist/estoe-0.2.0.dev0-py3-none-any.whl estoe --help
+      - run: uvx --from ./dist/estoe-0.2.0.dev0-py3-none-any.whl estoe pull --help
+      - run: uvx --from ./dist/estoe-0.2.0.dev0-py3-none-any.whl estoe --version
