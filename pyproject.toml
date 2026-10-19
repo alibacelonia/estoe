@@ -8,13 +8,13 @@ version = "0.1.0.dev0"
 description = "Secret to Env — generate local dotenv files from cloud secrets"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["boto3>=1.37,<2"]
 
 [project.scripts]
 estoe = "estoe.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8.3,<10", "ruff>=0.8,<1"]
+dev = ["pytest>=8.3,<10", "ruff>=0.8,<1", "python-dotenv>=1.1,<2"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/estoe"]
