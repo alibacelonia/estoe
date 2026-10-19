@@ -66,3 +66,25 @@ def test_prepared_version_matches_installation_lock_ci_and_guides():
     for path in GUIDES:
         assert f"`{expected}`" in path.read_text()
     assert f"Unreleased — {expected}" in (ROOT / "docs/CHANGELOG.md").read_text()
+
+
+def test_main_ruleset_scope_and_required_checks():
+    config = json.loads((ROOT / ".github/rulesets/main.json").read_text())
+    assert config["target"] == "branch"
+    assert config["enforcement"] == "active"
+    assert config["bypass_actors"] == []
+    assert config["conditions"] == {"ref_name": {"include": ["refs/heads/main"], "exclude": []}}
+    rules = {rule["type"]: rule.get("parameters", {}) for rule in config["rules"]}
+    assert set(rules) == {"deletion", "non_fast_forward", "pull_request", "required_status_checks"}
+    assert rules["pull_request"]["required_approving_review_count"] == 0
+    assert rules["pull_request"]["required_review_thread_resolution"] is True
+    status = rules["required_status_checks"]
+    assert status["strict_required_status_checks_policy"] is True
+    assert status["do_not_enforce_on_create"] is False
+    assert {check["context"] for check in status["required_status_checks"]} == {
+        "test (3.12)",
+        "test (3.13)",
+        "test (3.14)",
+        "audit",
+    }
+    assert all(check["integration_id"] == 15368 for check in status["required_status_checks"])

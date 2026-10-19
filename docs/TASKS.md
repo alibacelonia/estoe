@@ -24,6 +24,7 @@ executed; waived is an explicit owner risk acceptance, not a passing check.
 | RC-04 | P1 | done | Run multi-cloud Linux PR CI | branch push/PR approved | PR #3 initial revision 0d6608c passed Linux Python 3.12–3.14 CI and dependency audit; later commits must pass again; no merge/tag/upload authorized |
 | RC-05 | P1 | done | Prepare stable 0.2.0 metadata/changelog | preceding release gates | 38 focused tests, Ruff and fresh-environment wheel help/version passed; source/wheel inventories reviewed; version/lock/CI/docs agree; not published |
 | RC-06 | P1 | done | Improve safe validation feedback | owner UX request | 94 focused UX/CLI/docs tests and full 207-test offline suite passed; Ruff passed; fixed advice retains invalid_content, no offending key/value echo, all-provider output preservation |
+| GOV-01 | P1 | done | Protect remote main using an active ruleset | explicit owner request | Remote state verified protected with exact main scope and all requested controls; six focused tests, Ruff and whitespace checks passed; JSON is a reference, not automatic sync |
 
 Historical AWS release preparation: owner selected MIT. Version was 0.1.0; Linux CI verifies built-wheel
 help, pull help, and version. Local macOS tests remain 92 passed. Dependency audit passed;
@@ -45,7 +46,8 @@ Azure/GCP implementation is now owner-authorized development scope. Raw mode, Wi
 support and multi-secret mapping remain future candidates. GitHub push/release was authorized for AWS v0.1;
 new live reads, cloud changes, and package-registry publication still need separate approval.
 The owner subsequently approved pushing the reviewed multi-cloud branch and opening a PR
-for Linux CI only. Merge, tag/release, PyPI upload and remote settings remain unauthorized.
+for Linux CI only. The owner subsequently authorized creating a main-branch protection
+ruleset. Merge, tag/release, PyPI upload and unrelated remote settings remain unauthorized.
 
 ## Scaffold verification (2026-10-19)
 
@@ -115,3 +117,17 @@ No live AWS requests or secret writes were performed.
   fallback, destination preservation, documentation examples and package version consistency.
   No new dependency or credential/source-value logging was introduced. Remote checks on
   the latest PR revision are required; live Azure testing remains waived, not passed.
+
+## Main branch governance
+
+- Owner explicitly authorized protecting main and creating a branch ruleset. No existing
+  ruleset/classic protection was present, so created active ruleset 25403554, Protect main.
+- Remote read-back confirms main is protected and matches PR, required status, strict
+  up-to-date, conversation resolution, force-push and deletion rules. Feature branch
+  read-back returns no rules. No bypass actors are configured; zero review approvals
+  avoids blocking a solo maintainer. Check names/app ID came from actual Actions runs.
+- Stored the requested JSON and explanation in `.github/rulesets/`. This is not automatic
+  synchronization: reverting a commit does not undo remote settings. No destructive push
+  or deletion was used to verify protection, and no PR was merged or release published.
+- Six focused configuration/documentation tests, Ruff lint/format and diff whitespace
+  checks passed. Changes stay on the existing feature branch/PR, not directly on main.

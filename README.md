@@ -242,6 +242,11 @@ KMS key may also need `kms:Decrypt` on that key. See the [IAM examples](docs/iam
 Azure/GCP least-privilege roles are in their setup guides. No telemetry, secret cache,
 automatic login, or secret discovery is used.
 
+The protected `main` branch requires PRs, passing CI/audit, an up-to-date branch and
+resolved review conversations. Force pushes/deletion are blocked; no bypass actors are
+configured. Reviewer approvals are optional for solo maintenance. See the
+[ruleset reference](.github/rulesets/README.md). These rules do not publish releases.
+
 ## Project documents
 
 - [Requirements](docs/PROJECT.md)
