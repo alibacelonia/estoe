@@ -2,10 +2,10 @@
 
 ## Status and purpose
 
-Local scaffold and proposed MVP requirements, 2026-10-19. Owner confirmed the name `estoe`,
+Local MVP implementation, 2026-10-19. Owner confirmed the name `estoe`,
 JSON-key expansion as default, `--profile`, useful `--help`, and SSD project location.
-Python/uv/argparse and macOS/Linux support are working scaffold choices. Remaining product
-decisions are listed below; no live reads or publication are authorized.
+Owner authorized feature implementation. Python/uv/argparse and macOS/Linux are used with
+the concrete encoding and filesystem decisions below; no live reads or publication are authorized.
 
 Developers should be able to retrieve one explicitly selected cloud secret and generate
 local configuration without manually copying values. Public examples must be fictional.
@@ -17,6 +17,8 @@ local configuration without manually copying values. Public examples must be fic
 - Required: `--provider aws`, `--secret` (exact name/full ARN).
 - Optional: `--profile` (SDK credential chain by default), `--region` (profile/SDK default),
   `--output` (`.env` by default), `--preview`, and `--overwrite`.
+- `--allow-unignored` explicitly acknowledges writing an unignored destination; Git-tracked
+  destinations are always rejected. Preview and overwrite are mutually exclusive.
 - `estoe --help`, `estoe pull --help`, and `estoe --version` exit 0.
 - Invalid/missing arguments return usage help and exit 2; operational failures exit 1.
 - Help explains defaults, AWS credentials/SSO, fictional examples, plaintext output,
@@ -33,17 +35,17 @@ local configuration without manually copying values. Public examples must be fic
 | R-05 | Preserve keys and deterministic output. | Keys match `[A-Za-z_][A-Za-z0-9_]*`, remain unchanged, and sort consistently. Repeated inputs produce identical bytes. |
 | R-06 | Use a documented dotenv encoding contract. | A selected parser round-trips empty strings, spaces, quotes, backslashes, Unicode, hashes, equals, dollars, and multiline values; unsupported values fail without touching output. No execution or shell sourcing. |
 | R-07 | Preview shows key names/counts only. | Fetches/validates but writes nothing; no values, lengths, hashes, raw SDK payloads, or credentials appear in output. |
-| R-08 | Refuse overwrite unless explicitly authorized. | Existing file preserved; prompt before retrieval in a terminal, or require --overwrite noninteractively. Concurrent destination changes invalidate approval. |
+| R-08 | Refuse overwrite unless explicitly authorized. | Existing file preserved; prompt before retrieval in a terminal, or require --overwrite noninteractively. Detect changes to destination identity/content metadata before publication; serialize cooperating estoe writers. See the same-user race boundary below. |
 | R-09 | Enforce destination and Git safety. | Reject symlinks (including parent traversal), special files, directories, tracked files, and missing parents. Unignored Git destinations require a dedicated explicit acknowledgment; never modify .gitignore. No shell used for Git checks. |
-| R-10 | Publish private files atomically. | POSIX temp/final files are 0600 from creation; create-only publication cannot clobber a concurrent file. Authorized replacement is atomic. Failure leaves existing output intact and cleans temp files; no secret backup. |
+| R-10 | Publish private files atomically. | POSIX temp/final files are 0600 from creation; create-only publication cannot clobber a concurrent file. Authorized replacement is atomic. Failures before publication leave existing output intact and clean temp files; no secret backup. Reject macOS volumes with ownership disabled. |
 | R-11 | Protect values on all diagnostics paths. | Canary tests prove stdout/stderr/debug/errors contain no values or credentials. Stable categories replace raw SDK/JSON exceptions. No telemetry, persistent secret cache, or logging of payload objects. |
-| R-12 | Bound requests and content. | Proposed 15-second overall provider deadline, 2 total attempts, 64 KiB fetched content, and 256 KiB rendered output; tests cover limit enforcement. |
+| R-12 | Bound requests and content. | A worker bounds provider execution to 15 seconds plus process startup/cleanup, with 2 total SDK attempts, 64 KiB fetched content, and 256 KiB rendered output; tests cover limit enforcement. Git/filesystem preflight time is separate. |
 | R-13 | Keep tests offline. | Socket-denial guard, fake SDK, synthetic secrets, and temporary destinations cover all above failures; no AWS account/model required. |
 | R-14 | Document least privilege. | IAM examples use placeholder exact secret ARN with GetSecretValue; optional KMS Decrypt scoped to a customer-managed key. No credentials or real identifiers in examples. |
 | R-15 | Ship an installable CLI. | Built wheel installs in a fresh environment; help/version work outside the source tree; package checks, formatting, lint, offline tests, and dependency audit pass. |
 
-The scaffold only satisfies help/version and explicit unimplemented behavior; the remaining
-criteria must not be represented as delivered functionality.
+Implementation is verified through offline tests and local packaging. Live AWS behavior
+and Linux execution are not claimed as executed verification until explicitly run.
 
 ## Out of scope
 
@@ -52,20 +54,29 @@ automatic refresh; cloud writes/IAM provisioning; deployment; shell execution; s
 clipboard secret export; automatic login; Windows confidentiality guarantees; real data in
 fixtures; private reference-code redistribution.
 
-## Decisions requiring confirmation before implementation
+## Implementation decisions and remaining approval
 
-1. Python/uv/argparse as the chosen stack (currently working scaffold choice).
-2. Supported dotenv loader and exact multiline/dollar/interpolation behavior. `.env` syntax
-   differs across consumers; universal compatibility is not promised.
-3. Accept macOS/Linux first, with Windows deferred pending secure ACL behavior.
-4. Accept proposed deadline/content caps and overwrite/Git acknowledgment policy.
-5. Choose a license before public publication (MIT is a candidate, not yet selected).
+Python/uv/argparse, macOS/Linux first, 15-second provider limit, explicit overwrite and Git
+acknowledgment are used. The supported consumer is python-dotenv 1.x with
+`interpolate=False`; double-quoted values use its documented escapes, including multiline
+values, while dollar expressions remain literal. Universal dotenv/shell compatibility is
+not promised. python-dotenv is a development/test dependency; consumers install it separately.
+
+The output parent must be owned by the caller and not group/world writable. On macOS,
+diskutil must confirm ownership enforcement. The SSD may store the project even when
+ownership is disabled, but secret output must use another ownership-enforcing volume.
+Git and diskutil (macOS) are required for preflight. No system setting is changed automatically.
+
+Select a license before public publication (MIT is a candidate, not yet selected).
 
 ## Authorization boundary
 
-Requirements, scaffold, tests, and local commits are authorized. Owner approval of a concrete
-scope is required for application implementation; separate approval is required for live
+Requirements, implementation, tests, and local commits are authorized. Separate approval is required for live
 secret retrieval, cloud changes, remote/package creation/publication, and destructive actions.
 Generated dotenv files are plaintext; the CLI cannot prevent OS users, backups, sync software,
 or downstream applications with access from exposing them. Managed-runtime memory erasure
-is not guaranteed.
+is not guaranteed. POSIX replacement has no portable compare-and-swap primitive: the lock
+coordinates estoe writers and checks catch observed changes, but another same-user program
+can race the final check. Such programs, privileged users, permissive inherited ACLs, and
+hostile shared/synchronized filesystems are outside this confidentiality boundary. A
+post-publication interrupt/cleanup error may leave the fully written file in place.

@@ -2,7 +2,7 @@ project:
   name: estoe
   description: "Secret to Env — generate local dotenv files from cloud secrets"
   type: cli
-  stage: requirements-and-scaffold
+  stage: local-mvp-implemented
 stack:
   language: python
   python: ">=3.12"

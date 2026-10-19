@@ -1,18 +1,45 @@
 # Security posture
 
-This version is a local CLI scaffold; it performs no cloud reads or dotenv writes.
-Planned controls are requirements, not implemented security claims.
+The AWS implementation is tested offline. No live secrets have been retrieved during
+development verification, and no remote repository/package has been published.
 
 Use existing credentials/SSO. No command-line credential flags, telemetry, raw errors, secret
-logging, caches, clipboard output, or automatic shell sourcing are planned. Output `.env`
-files are plaintext, ignored by Git, and intended to have POSIX mode 0600.
+logging, caches, clipboard output, or automatic shell sourcing are implemented. Output `.env`
+files are plaintext with mode 0600; tracked files are rejected and unignored files require
+explicit acknowledgment. SDK errors are translated to fixed messages, including during
+session construction. Worker SDK logging is disabled. stdout never contains values.
 
 Do not put real values, account IDs, internal URLs, resource names, credentials, or private
 customer/employer code in this public project. Tests use synthetic data; live tests require
 explicit approval and authorized synthetic sandbox resources. No AWS/IAM changes are implied.
 
-Before release, verify encoding, permissions, symlink/race protection, diagnostics canaries,
-Git checks, and failure cleanup. No guarantee is made for backups, sync tools, memory erasure,
-or downstream applications. Windows needs ACL design and tests before equivalent support.
+Tests cover encoding with interpolation disabled, permissions, symlinks, observed file/parent
+changes, atomic create-only non-clobber, Git checks, diagnostics canaries, and failure cleanup.
+Review evidence in TASKS; tests are not a formal proof of confidentiality.
+
+On macOS, diskutil must confirm ownership enforcement on the destination mount. The current
+development SSD has ownership disabled and is therefore rejected for secret output. The CLI
+does not enable ownership or change system settings. Install/run source from the SSD and
+choose a private ownership-enforcing output directory instead.
+
+The parent must be owned by the caller, with no group/world write bits. A pinned directory
+descriptor prevents symlink redirection; file identity/content metadata is checked before
+publication. Directory flock serializes cooperating estoe processes. POSIX replacement lacks
+a portable compare-and-swap primitive, so an uncooperative same-user process can race the final
+check. Inherited ACLs, privileged users, hostile filesystems, backups/sync tools, core dumps,
+memory erasure, and downstream applications remain outside the confidentiality boundary.
+Avoid directories with permissive ACLs. Crashes after publication may leave the completed
+output, and storage failures can prevent temporary-file cleanup; inspect private temp files
+after such failures. Windows requires separate ACL design and tests.
+
+The provider uses a spawned process and a private bounded pipe. Its 15-second deadline covers
+credential resolution and SDK calls, with startup/cleanup overhead. SDK credential helpers
+are trusted user configuration and may spawn subprocesses of their own. Killing the worker
+does not cancel already received AWS requests or guarantee termination of independent helpers.
+
+AWS permissions: GetSecretValue for exactly the selected secret, plus KMS Decrypt for a
+customer-managed key if needed. See placeholder policies in `docs/iam/`. No cloud write
+operation exists. Logs/CloudTrail may include secret selector metadata on AWS's side;
+avoid sensitive information in resource names and command history.
 
 License and a private vulnerability-reporting channel must be selected before publication.
