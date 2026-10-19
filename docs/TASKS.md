@@ -17,6 +17,12 @@ Statuses: todo, in-progress, blocked, done. Done means the stated checks were ex
 | MC-02 | P0 | done | End-to-end manual setup/testing guides | MC-01 | Separate guides match actual flags/auth contracts; shell blocks syntax-checked only |
 | MC-03 | P1 | done | Local package/audit/security verification | MC-01, MC-02 | 171 offline macOS tests, Ruff, wheel/source build, installed help, dependency audit and sensitive-diff review passed; new Linux CI execution pending |
 | MC-04 | P1 | blocked | Owner-run Azure/GCP sandbox testing | owner setup/run approval | Follow guides using synthetic data and record pass/fail without identifiers or values |
+| RC-01 | P1 | done | Suppress SDK warnings as well as logging | owner release-readiness request | 81 provider tests passed; warning canaries stay off stdout/stderr on success/failure, including warnings-as-errors; filters restored; Ruff passed |
+| RC-02 | P1 | blocked | Complete Azure live smoke test | explicit target/read approval or owner-run result | Record synthetic preview/export result without identifiers or values; GCP pull/preview already owner-reported successful |
+| RC-03 | P1 | todo | Refresh beginner-friendly release documentation | RC-02 | README and related guides match tested behavior and distinguish released/development status |
+| RC-04 | P1 | blocked | Run multi-cloud Linux PR CI | branch push/PR approval | Python 3.12–3.14 CI and dependency audit pass before merge |
+| RC-05 | P1 | todo | Prepare stable 0.2.0 metadata/changelog | preceding release gates | Version, lockfile, package smoke and changelog agree; no tag/upload without approval |
+| RC-06 | P1 | todo | Improve safe validation feedback | owner UX request | Fixed actionable validation categories, no payload/key disclosure, preservation and CLI tests |
 
 Release preparation: owner selected MIT. Version is 0.1.0; Linux CI now verifies built-wheel
 help, pull help, and version. Local macOS tests remain 92 passed. Dependency audit passed;

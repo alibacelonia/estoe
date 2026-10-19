@@ -95,3 +95,15 @@
   setup/quota configuration is managed by the user; no service-account keys are created.
   REST avoids native gRPC diagnostics bypassing Python logging. Regional endpoints and
   explicit version selection require future scope. A checksum mismatch fails closed.
+
+## ADR-011: Keep SDK warnings behind the safe diagnostic boundary
+
+- Status: accepted for release-readiness work.
+- Context: GCP ADC can emit a Python warning directly to stderr even when SDK logging is
+  disabled. Python warnings may contain uncontrolled provider context.
+- Decision: suppress Python warnings inside the isolated worker's reader call, including
+  imports and credential resolution. Preserve warning filters outside that scope and use
+  fixed estoe errors plus documented setup/troubleshooting advice instead of SDK messages.
+- Consequences: successful reads remain successful with warnings configured as errors.
+  Quota-project advice must stay discoverable in the GCP guide; this is not suppression of
+  arbitrary native or external credential-helper output.

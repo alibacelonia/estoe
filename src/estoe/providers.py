@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import multiprocessing
+import warnings
 from collections.abc import Callable
 from multiprocessing.connection import Connection
 from typing import Protocol
@@ -98,10 +99,13 @@ def _worker(connection: Connection, secret: str, profile: str | None, region: st
 
 
 def send_result(connection: Connection, reader: Callable, *arguments: str | None) -> None:
-    # SDK debug logging can include payloads. This process never emits SDK diagnostics.
+    # SDK logging and warnings may include sensitive context. Suppress both in this worker;
+    # authentication/setup advice belongs in our value-free diagnostics and user guides.
     logging.disable(logging.CRITICAL)
     try:
-        value = reader(*arguments)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            value = reader(*arguments)
         if not isinstance(value, str):
             raise EstoeError("invalid_content")
         if len(value.encode("utf-8")) > MAX_SECRET_BYTES:

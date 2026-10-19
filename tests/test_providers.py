@@ -1,4 +1,5 @@
 import time
+import warnings
 
 import boto3
 import pytest
@@ -6,7 +7,7 @@ from botocore.exceptions import ClientError, NoCredentialsError, ProfileNotFound
 from botocore.stub import Stubber
 
 from estoe.errors import EstoeError
-from estoe.providers import AWSProvider, _worker, read_aws
+from estoe.providers import AWSProvider, _worker, read_aws, send_result
 
 
 class Client:
@@ -205,3 +206,38 @@ def test_worker_suppresses_arbitrary_exception(monkeypatch):
     pipe = Pipe()
     _worker(pipe, "example", None, None)
     assert pipe.messages == [b"-provider"]
+
+
+@pytest.mark.parametrize("fails", [False, True])
+def test_worker_suppresses_sdk_warnings_and_restores_filters(monkeypatch, capsys, fails):
+    monkeypatch.setattr("estoe.providers.logging.disable", lambda level: None)
+
+    class Pipe:
+        def __init__(self):
+            self.messages = []
+            self.closed = False
+
+        def send_bytes(self, message):
+            self.messages.append(message)
+
+        def close(self):
+            self.closed = True
+
+    def reader():
+        warnings.warn("synthetic-sensitive-canary", UserWarning, stacklevel=1)
+        if fails:
+            raise EstoeError("credentials")
+        return '{"A":"synthetic"}'
+
+    # Also exercise environments using PYTHONWARNINGS=error. Suppressing an advisory
+    # warning must not turn an otherwise valid read into a provider failure.
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        original_filters = warnings.filters[:]
+        pipe = Pipe()
+        send_result(pipe, reader)
+        assert warnings.filters == original_filters
+    assert pipe.messages == ([b"-credentials"] if fails else [b'+{"A":"synthetic"}'])
+    assert pipe.closed
+    output = capsys.readouterr()
+    assert output.out == output.err == ""

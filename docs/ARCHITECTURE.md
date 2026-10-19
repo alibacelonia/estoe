@@ -40,7 +40,9 @@ output files. A directory flock serializes estoe; metadata rechecks detect obser
 The final overwrite check is not a portable compare-and-swap against malicious same-user writers.
 
 The shared SDK worker covers credentials, session construction, request, and retries with a 15-second
-deadline plus process startup/cleanup. Worker errors are fixed codes. Preview fetches and
+deadline plus process startup/cleanup. Python SDK logging and warnings are suppressed in
+the worker reader; actionable authentication advice is provided through fixed errors and
+the testing guides rather than raw SDK diagnostics. Worker errors are fixed codes. Preview fetches and
 validates without publishing. The filesystem is preflighted even in preview mode.
 
 On macOS diskutil confirms ownership enforcement; unsupported volumes fail closed. No

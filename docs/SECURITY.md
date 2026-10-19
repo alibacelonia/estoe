@@ -9,7 +9,9 @@ Use existing credentials/SSO. No command-line credential flags, telemetry, raw e
 logging, caches, clipboard output, or automatic shell sourcing are implemented. Output `.env`
 files are plaintext with mode 0600; tracked files are rejected and unignored files require
 explicit acknowledgment. SDK errors are translated to fixed messages, including during
-session construction. Worker SDK logging is disabled. stdout never contains values.
+session construction. Worker SDK logging and Python warnings during reads are suppressed.
+stdout never contains values. This does not capture arbitrary native code or trusted
+credential-helper output; see the boundaries below.
 
 Do not put real values, account IDs, internal URLs, resource names, credentials, or private
 customer/employer code in this public project. Tests use synthetic data; live tests require
