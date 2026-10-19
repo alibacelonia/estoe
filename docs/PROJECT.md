@@ -8,6 +8,9 @@ Owner authorized feature implementation. Python/uv/argparse and macOS/Linux are 
 the concrete encoding and filesystem decisions below. No agent live reads or cloud changes
 are authorized. The AWS release is published; the owner approved pushing the multi-cloud
 branch and opening a PR only (not merging, tagging, or uploading packages).
+Subsequently the owner merged the multi-cloud PR and authorized a main ruleset, then
+requested publishing CI and documentation through a new PR. That authorizes preparing,
+testing, committing and pushing the workflow, not creating a release or uploading to PyPI.
 
 Developers should be able to retrieve one explicitly selected cloud secret and generate
 local configuration without manually copying values. Public examples must be fictional.
@@ -46,6 +49,8 @@ local configuration without manually copying values. Public examples must be fic
 | R-14 | Document least privilege. | IAM examples use placeholder exact secret ARN with GetSecretValue; optional KMS Decrypt scoped to a customer-managed key. No credentials or real identifiers in examples. |
 | R-15 | Ship an installable CLI. | Built wheel installs in a fresh environment; help/version work outside the source tree; package checks, formatting, lint, offline tests, and dependency audit pass. |
 | R-16 | Explain content validation safely. | Keep the invalid_content code and exit 1; fixed messages distinguish JSON syntax/root shape/duplicate keys/variable names/string types/NUL/Unicode without echoing content, offending keys, positions, or raw exceptions. Tests prove every provider preserves existing output and creates no file on invalid content. |
+| REL-01 | Prepare gated PyPI publishing. | PR/manual runs validate/build without uploading. Stable published GitHub releases require matching version/tag, checked-out tag commit and origin/main ancestry; tests/audit/package checks pass first. Only an explicitly enabled, protected pypi environment can publish using OIDC, without permanent API tokens or source checkout in the upload job. |
+| REL-02 | Link package and source truthfully. | README links to the planned PyPI page with a pending label until publication; built package metadata includes the GitHub repository, issues and docs links. Guide covers owner setup, approval, versioning and safe failure/recovery; no actual upload is claimed without execution. |
 
 Implementation is verified through offline tests and local packaging. The owner reported
 successful AWS pull and GCP pull/preview on macOS; agent verification did not retrieve live

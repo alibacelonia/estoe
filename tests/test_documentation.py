@@ -15,7 +15,12 @@ from estoe.cli import build_parser, validate_options
 from estoe.encoding import encode_env, parse_secret
 
 ROOT = Path(__file__).resolve().parents[1]
-GUIDES = [ROOT / "README.md", ROOT / "docs/TESTING_AZURE.md", ROOT / "docs/TESTING_GCP.md"]
+GUIDES = [
+    ROOT / "README.md",
+    ROOT / "docs/TESTING_AZURE.md",
+    ROOT / "docs/TESTING_GCP.md",
+    ROOT / "docs/PUBLISHING.md",
+]
 
 
 @pytest.mark.parametrize("path", GUIDES, ids=lambda path: path.name)
@@ -62,7 +67,7 @@ def test_prepared_version_matches_installation_lock_ci_and_guides():
         == expected
     )
     workflow = (ROOT / ".github/workflows/ci.yml").read_text()
-    assert workflow.count(f"estoe-{expected}-py3-none-any.whl") == 3
+    assert "uv run python scripts/smoke_wheel.py" in workflow
     for path in GUIDES:
         assert f"`{expected}`" in path.read_text()
     assert f"Unreleased — {expected}" in (ROOT / "docs/CHANGELOG.md").read_text()
@@ -88,3 +93,14 @@ def test_main_ruleset_scope_and_required_checks():
         "audit",
     }
     assert all(check["integration_id"] == 15368 for check in status["required_status_checks"])
+
+
+def test_package_links_are_bidirectional_and_readme_does_not_claim_publication():
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+    assert project["urls"]["Repository"] == "https://github.com/alibacelonia/estoe"
+    assert project["urls"]["PyPI"] == "https://pypi.org/project/estoe/"
+    content = (ROOT / "README.md").read_text()
+    assert project["urls"]["Repository"] in content
+    assert project["urls"]["PyPI"] in content
+    assert "available after first publication" in content
+    assert "pending first publication" in content

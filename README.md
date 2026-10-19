@@ -11,6 +11,12 @@ the owner waived that release gate. This is not verification of live Azure
 authentication, permissions, or networking. Linux CI passed the initial multi-cloud
 PR revision on Python 3.12–3.14; subsequent changes must pass again before merging.
 
+[GitHub repository](https://github.com/alibacelonia/estoe) ·
+[PyPI package — available after first publication](https://pypi.org/project/estoe/)
+
+The PyPI destination is linked for the upcoming release; the page may return 404
+until the first successful upload. This is not a claim that estoe is published there.
+
 ## Before you start
 
 You need Python 3.12+, uv, Git, and macOS or Linux. Windows is not supported yet.
@@ -44,15 +50,30 @@ estoe --help
 estoe pull --help
 ```
 
-This installs the tagged GitHub release. No PyPI publication is claimed; do not
-assume `pip install estoe` installs this project.
+This installs the tagged GitHub release. Until the first PyPI publication, use this
+GitHub install rather than assuming `pip install estoe` installs this project.
+
+### PyPI installation (after the first approved publication)
+
+First verify that [the PyPI page](https://pypi.org/project/estoe/) links back to
+[this repository](https://github.com/alibacelonia/estoe) and lists the intended version.
+Only after that version is available, install the standalone CLI with:
+
+```bash
+uv tool install estoe
+estoe --version
+estoe pull --help
+```
+
+For an application virtual environment, `python -m pip install estoe` also installs
+the CLI there. You do not need to clone the repository for a PyPI installation.
 
 ### Multi-cloud development version: AWS, Azure, GCP
 
-Use the multi-cloud branch or its PR checkout:
+The multi-cloud changes are merged into main. To run the latest source checkout:
 
 ```bash
-git clone --branch feature/azure-gcp-providers https://github.com/alibacelonia/estoe.git
+git clone https://github.com/alibacelonia/estoe.git
 cd estoe
 uv sync --locked
 uv run estoe --version
@@ -81,8 +102,8 @@ GCP `--project` selects the secret's project, not the login identity or quota pr
 
 New to Azure or GCP? Start with the complete setup guides:
 
-- [Azure: create a synthetic secret, configure permissions, and test](docs/TESTING_AZURE.md)
-- [GCP: create a synthetic secret, configure ADC, and test](docs/TESTING_GCP.md)
+- [Azure: create a synthetic secret, configure permissions, and test](https://github.com/alibacelonia/estoe/blob/main/docs/TESTING_AZURE.md)
+- [GCP: create a synthetic secret, configure ADC, and test](https://github.com/alibacelonia/estoe/blob/main/docs/TESTING_GCP.md)
 
 Those guides include resource creation and IAM changes for you to review and run.
 Cloud resources and reads may cost money. estoe never performs setup automatically.
@@ -218,10 +239,10 @@ Do not paste real secret content into a JSON-validation website or public issue.
 On an external macOS drive with “Ignore ownership on this volume” enabled, choose
 `--output /absolute/path/on/a/private/volume/.env.local` instead. estoe never changes
 system settings. GCP quota-project setup is explained in the
-[GCP guide](docs/TESTING_GCP.md#7-negative-tests-and-troubleshooting).
+[GCP guide](https://github.com/alibacelonia/estoe/blob/main/docs/TESTING_GCP.md#7-negative-tests-and-troubleshooting).
 After an interrupt or error, check whether the destination already exists before
 retrying: a completed atomic write can survive an interruption immediately afterward.
-See [security boundaries](docs/SECURITY.md) for the full limitations.
+See [security boundaries](https://github.com/alibacelonia/estoe/blob/main/docs/SECURITY.md) for the full limitations.
 
 ## Development and permissions
 
@@ -238,27 +259,41 @@ uv build
 Automated tests use synthetic data and deny network access. Azure's live-test gate
 was waived, not passed. Its guide remains available for voluntary sandbox testing.
 AWS needs `secretsmanager:GetSecretValue` on the intended secret; a customer-managed
-KMS key may also need `kms:Decrypt` on that key. See the [IAM examples](docs/iam/).
+KMS key may also need `kms:Decrypt` on that key. See the [IAM examples](https://github.com/alibacelonia/estoe/tree/main/docs/iam).
 Azure/GCP least-privilege roles are in their setup guides. No telemetry, secret cache,
 automatic login, or secret discovery is used.
 
 The protected `main` branch requires PRs, passing CI/audit, an up-to-date branch and
 resolved review conversations. Force pushes/deletion are blocked; no bypass actors are
 configured. Reviewer approvals are optional for solo maintenance. See the
-[ruleset reference](.github/rulesets/README.md). These rules do not publish releases.
+[ruleset reference](https://github.com/alibacelonia/estoe/blob/main/.github/rulesets/README.md). These rules do not publish releases.
+
+## Maintainers: packaging and PyPI releases
+
+CI checks formatting, tests, dependency vulnerabilities and the installed package.
+The separate **Package and publish** workflow also validates package metadata and
+stores downloadable wheel/source artifacts. PRs and manual runs **never upload** to PyPI.
+
+Publishing is disabled by default. After one-time Trusted Publisher and approval
+setup, an approved stable GitHub release such as `v0.2.0` can publish to PyPI.
+No permanent PyPI token is needed. Package metadata includes the GitHub repository,
+issues, documentation and changelog URLs for PyPI's project links.
+
+Follow the [step-by-step publishing guide](https://github.com/alibacelonia/estoe/blob/main/docs/PUBLISHING.md).
+Merging this workflow does not publish a package or configure your PyPI account.
 
 ## Project documents
 
-- [Requirements](docs/PROJECT.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Decisions](docs/DECISIONS.md)
-- [Task plan](docs/TASKS.md)
-- [Security](docs/SECURITY.md)
-- [Changelog](docs/CHANGELOG.md)
+- [Requirements](https://github.com/alibacelonia/estoe/blob/main/docs/PROJECT.md)
+- [Architecture](https://github.com/alibacelonia/estoe/blob/main/docs/ARCHITECTURE.md)
+- [Decisions](https://github.com/alibacelonia/estoe/blob/main/docs/DECISIONS.md)
+- [Task plan](https://github.com/alibacelonia/estoe/blob/main/docs/TASKS.md)
+- [Security](https://github.com/alibacelonia/estoe/blob/main/docs/SECURITY.md)
+- [Changelog](https://github.com/alibacelonia/estoe/blob/main/docs/CHANGELOG.md)
 
 Source, issues, and release artifacts: [alibacelonia/estoe](https://github.com/alibacelonia/estoe).
-A PyPI link will be added only after publication.
+PyPI destination: [estoe](https://pypi.org/project/estoe/) (pending first publication).
 
 ## License
 
-[MIT](LICENSE).
+[MIT](https://github.com/alibacelonia/estoe/blob/main/LICENSE).

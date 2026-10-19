@@ -19,14 +19,18 @@ dependencies = [
 ]
 
 [project.urls]
+Homepage = "https://github.com/alibacelonia/estoe"
 Repository = "https://github.com/alibacelonia/estoe"
 Issues = "https://github.com/alibacelonia/estoe/issues"
+Documentation = "https://github.com/alibacelonia/estoe#readme"
+Changelog = "https://github.com/alibacelonia/estoe/blob/main/docs/CHANGELOG.md"
+PyPI = "https://pypi.org/project/estoe/"
 
 [project.scripts]
 estoe = "estoe.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8.3,<10", "ruff>=0.8,<1", "python-dotenv>=1.1,<2"]
+dev = ["pytest>=8.3,<10", "ruff>=0.8,<1", "python-dotenv>=1.1,<2", "pyyaml>=6.0.2,<7"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/estoe"]
