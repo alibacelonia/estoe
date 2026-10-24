@@ -25,6 +25,7 @@ executed; waived is an explicit owner risk acceptance, not a passing check.
 | RC-05 | P1 | done | Prepare stable 0.2.0 metadata/changelog | preceding release gates | 38 focused tests, Ruff and fresh-environment wheel help/version passed; source/wheel inventories reviewed; version/lock/CI/docs agree; not published |
 | RC-06 | P1 | done | Improve safe validation feedback | owner UX request | 94 focused UX/CLI/docs tests and full 207-test offline suite passed; Ruff passed; fixed advice retains invalid_content, no offending key/value echo, all-provider output preservation |
 | GOV-01 | P1 | done | Protect remote main using an active ruleset | explicit owner request | Remote state verified protected with exact main scope and all requested controls; six focused tests, Ruff and whitespace checks passed; JSON is a reference, not automatic sync |
+| SEC-01 | P0 | done | Remediate eMudhra CA/tooling dependencies | owner security request | certifi/uv floors, updated lock/publisher/CI, 232 offline tests, Ruff, build, fresh-wheel smoke and dependency audit passed; no cloud reads or publication |
 | PUB-01 | P1 | done | Prepare and test PyPI CI/delivery and public links | owner request | 229 offline tests, Ruff, actionlint, Twine 7 metadata checks, installed-wheel smoke and locked audit passed before commit; workflow/release boundaries reviewed; no actual publication |
 | PUB-02 | P1 | blocked | Configure PyPI Trusted Publisher and approval environment | owner account/setup actions | Exact owner/repo/workflow/environment binding, required reviewer/tag restrictions and explicit repository enable variable; no secrets in Git |
 | PUB-03 | P1 | blocked | First approved PyPI release and registry install verification | PUB-01 merged; PUB-02; explicit owner release approval | Stable tag/version/main checks pass, owner approves publish, registry metadata/version/installation verified before README claims publication |
@@ -158,3 +159,30 @@ No live AWS requests or secret writes were performed.
   Repository and PyPI), source inventory, YAML conditions and permissions, tokenless upload
   action compatibility, and staged changes for sensitive content. No release blocker was
   found in this preparation; real OIDC/upload execution still requires owner setup/approval.
+
+
+## eMudhra certificate remediation (2026-10-24)
+
+- Reviewed upstream certifi/uv advisories and publisher requirements. Original certifi
+  2026.10.18 contains the initial fix but predates the recommended compatibility release;
+  local uv 0.10.6 and the pinned publisher's pip/certifi/sigstore were affected.
+- Require certifi>=2026.10.19 for all installs; lock 2026.10.23. Require uv>=0.13.4;
+  CI pins 0.13.5 with caching disabled. Updated publisher to merged upstream commit
+  2442bad8 (pip 26.2.2, certifi 2026.10.19, sigstore 4.5.1). Reviewed its diff from
+  v1.14.3: only pip prerequisite pins/hashes change. Publisher container/upload unexecuted.
+- Bootstrapped repository .venv pip 26.2.2 using the owner-provided SHA-256-verified
+  wheel; installed certifi 2026.10.23 and uv 0.13.5 from public PyPI. Global Homebrew uv
+  remains unchanged; use `.venv/bin/uv` or activate this environment for patched tooling.
+  Sync used --inexact to retain these environment-only installer packages.
+- Python 3.14.3/macOS: 232 offline tests passed, including three new checks of effective
+  certifi/botocore trust paths against four incident root fingerprints. Ruff lint/format,
+  source/wheel build, strict Twine 7 checks, fresh locked-dependency wheel installation
+  and help/pull-help/version outside the source root passed. Wheel metadata contains the
+  certifi floor; source inventory excludes virtual environments, dotenv and key files.
+- Locked all-group pip-audit 2.10.0 reported no known vulnerabilities. Verified original
+  uv 0.10.6 fails closed on the new required-version guard; whitespace check passed.
+  Workflow parsing/shell syntax is covered by the offline suite; actionlint was unavailable.
+- No project container build, conda or pixi configuration exists. System/custom CA stores,
+  credential helpers, unrelated environments, global tools and old releases were not
+  updated. No live cloud requests, remote mutation, push or publication occurred; new
+  Linux CI and upstream publisher runtime verification remain unexecuted.

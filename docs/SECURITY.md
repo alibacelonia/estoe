@@ -66,6 +66,45 @@ avoid sensitive information in resource names and command history.
   of the CLI. Test using only examples/synthetic-secret.json; never replace that fixture
   with real credentials.
 
+## TLS certificate updates
+
+The October 2026 [eMudhra incident](https://emudhra.we-have-a-problem.com/)
+affects clients that trust the compromised certificate chains. The original checkout
+locked certifi 2026.10.18, which contains the initial emSign removal but predates the
+recommended 2026.10.19 compatibility fix. The checked local uv was 0.10.6, below the
+[patched 0.13.4 minimum](https://github.com/astral-sh/uv/security/advisories/GHSA-hq85-5cpj-mr62).
+
+estoe now declares `certifi>=2026.10.19` as a runtime dependency, including in wheel
+metadata, and locks 2026.10.23. Azure/GCP use Requests/certifi; botocore also selects
+certifi when installed, ahead of its fallback bundled CA file. Offline tests check
+these effective default bundles against the incident's four published root fingerprints.
+This does not validate custom CA files, SDK profile overrides, credential helpers
+(such as Azure CLI), or operating-system stores; their owners must update them separately.
+TLS verification remains enabled.
+
+Project uv operations require uv 0.13.4+; CI pins 0.13.5 with dependency caching
+disabled. Use pip 26.2.2+ when managing virtual environments with pip. Bootstrap an
+old pip using the incident notice's SHA-256-pinned pip wheel before downloading other
+updates. In an activated environment with patched pip, use:
+
+```bash
+python -m pip install --upgrade "certifi>=2026.10.19" "uv>=0.13.4"
+```
+
+For this checkout, use patched uv and run `uv sync --locked`. Existing GitHub-tagged
+installations and previously built distributions do not inherit these changes: rebuild
+or reinstall from reviewed updated source. No replacement release is published here.
+No conda/pixi configuration or project container build exists in this repository. If
+packaging estoe in your own container, refresh the base image and system CA package and
+rebuild with `--pull --no-cache`; updating Python packages alone does not update system CAs.
+
+The PyPI publisher action is pinned to upstream commit
+`2442bad8f54b06a326f3030ef5e6a7a674118557`, whose runtime requirements include
+certifi 2026.10.19, sigstore 4.5.1 and pip 26.2.2. This is the upstream merged pip
+fix after v1.14.3, not a new tagged action release. The prior pin contained affected
+versions of all three packages. Its container is supplied by upstream; no publisher
+container or upload was executed locally. Existing release/owner-approval gates remain.
+
 ## Reporting vulnerabilities
 
 Do not include secret values, generated dotenv files, or credentials in public issues.

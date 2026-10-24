@@ -11,6 +11,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dependencies = [
+    "certifi>=2026.10.19",
     "boto3>=1.37,<2",
     "azure-identity>=1.23,<2",
     "azure-keyvault-secrets>=4.9,<5",
@@ -44,3 +45,6 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.uv]
+required-version = ">=0.13.4"

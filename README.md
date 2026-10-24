@@ -42,6 +42,12 @@ estoe reads secrets; it does not create them or log you in.
 
 ## 1. Install the version you want
 
+Use **uv 0.13.4+** or **pip 26.2.2+** before installing or updating estoe. Older
+installers may trust compromised eMudhra certificate chains. This checkout requires
+`certifi>=2026.10.19` and locks certifi 2026.10.23; existing installations must be
+updated separately. See [TLS certificate updates](docs/SECURITY.md#tls-certificate-updates)
+for the environment and custom certificate-store boundaries.
+
 ### Released version: AWS only
 
 ```bash
