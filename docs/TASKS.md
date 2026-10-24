@@ -25,11 +25,11 @@ executed; waived is an explicit owner risk acceptance, not a passing check.
 | RC-05 | P1 | done | Prepare stable 0.2.0 metadata/changelog | preceding release gates | 38 focused tests, Ruff and fresh-environment wheel help/version passed; source/wheel inventories reviewed; version/lock/CI/docs agree; not published |
 | RC-06 | P1 | done | Improve safe validation feedback | owner UX request | 94 focused UX/CLI/docs tests and full 207-test offline suite passed; Ruff passed; fixed advice retains invalid_content, no offending key/value echo, all-provider output preservation |
 | GOV-01 | P1 | done | Protect remote main using an active ruleset | explicit owner request | Remote state verified protected with exact main scope and all requested controls; six focused tests, Ruff and whitespace checks passed; JSON is a reference, not automatic sync |
-| REL-021 | P0 | in-progress | Publish security patch 0.2.1 | explicit owner release request | Version/docs/lock agree, local and Linux checks pass, release workflow uploads, public PyPI installation verified |
+| REL-021 | P0 | done | Publish security patch 0.2.1 | explicit owner release request | Version/docs/lock agree, local and Linux checks pass, release workflow uploads, public PyPI installation verified |
 | SEC-01 | P0 | done | Remediate eMudhra CA/tooling dependencies | owner security request | certifi/uv floors, updated lock/publisher/CI, 232 offline tests, Ruff, build, fresh-wheel smoke and dependency audit passed; no cloud reads or publication |
 | PUB-01 | P1 | done | Prepare and test PyPI CI/delivery and public links | owner request | 229 offline tests, Ruff, actionlint, Twine 7 metadata checks, installed-wheel smoke and locked audit passed before commit; workflow/release boundaries reviewed; no actual publication |
-| PUB-02 | P1 | blocked | Configure PyPI Trusted Publisher and approval environment | owner account/setup actions | Exact owner/repo/workflow/environment binding, required reviewer/tag restrictions and explicit repository enable variable; no secrets in Git |
-| PUB-03 | P1 | blocked | First approved PyPI release and registry install verification | PUB-01 merged; PUB-02; explicit owner release approval | Stable tag/version/main checks pass, owner approves publish, registry metadata/version/installation verified before README claims publication |
+| PUB-02 | P1 | done | Configure PyPI Trusted Publisher and approval environment | owner account/setup actions | Exact owner/repo/workflow/environment binding, required reviewer/tag restrictions and explicit repository enable variable; no secrets in Git |
+| PUB-03 | P1 | done | First approved PyPI release and registry install verification | PUB-01 merged; PUB-02; explicit owner release approval | Stable tag/version/main checks pass, owner approves publish, registry metadata/version/installation verified before README claims publication |
 
 Historical AWS release preparation: owner selected MIT. Version was 0.1.0; Linux CI verifies built-wheel
 help, pull help, and version. Local macOS tests remain 92 passed. Dependency audit passed;
@@ -199,3 +199,22 @@ No live AWS requests or secret writes were performed.
   source/wheel build, strict Twine metadata and installed-wheel help/version checks.
   Reviewed source inventory and the wheel's certifi floor. Release CI/upload and public
   registry verification are still pending at this commit.
+
+
+## Security patch release verification (2026-10-24)
+
+- Release preparation [PR #6](https://github.com/alibacelonia/estoe/pull/6) merged as
+  33e1b8a after Linux Python 3.12–3.14 tests, dependency audits and package build passed.
+  Merged-main CI/audit also passed before creating the release.
+- Published [v0.2.1](https://github.com/alibacelonia/estoe/releases/tag/v0.2.1) from that
+  exact commit. [Release workflow](https://github.com/alibacelonia/estoe/actions/runs/40052665381)
+  passed tests, audit, stable tag/main checks, package checks and OIDC upload. The
+  existing pypi reviewer gate cleared; no publisher or remote settings were changed.
+- Inspected the exact release wheel/source artifacts before upload. Public PyPI 0.2.1
+  metadata contains certifi>=2026.10.19 and the repository URL; both public distribution
+  SHA-256 hashes match the reviewed CI artifacts. No old version was overwritten.
+- Installed estoe==0.2.1 from public PyPI without cache into a new repository-local
+  environment. Help, pull help, version and botocore's certifi selection passed outside
+  the source root; installed certifi is 2026.10.23. No cloud secret reads occurred.
+- PUB-02/PUB-03 are now complete based on actual gate/OIDC/registry verification;
+  earlier pending-upload entries remain historical preparation evidence.

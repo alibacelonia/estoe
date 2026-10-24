@@ -71,4 +71,5 @@ The upload job downloads only those artifacts, has OIDC permission only, runs no
 source, and uses PyPA Trusted Publishing. It requires a stable published release in this
 repository plus an explicit enable variable and the owner-configured pypi environment.
 The YAML does not configure environment reviewers or the PyPI account; those remain manual
-prerequisites. End-to-end publishing requires separate approval and remains unexecuted.
+prerequisites. The owner authorized the 0.2.1 release; its gated OIDC upload and fresh public PyPI
+installation were verified on 2026-10-24. See TASKS for run and artifact evidence.
