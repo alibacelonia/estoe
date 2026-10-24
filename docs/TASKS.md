@@ -25,6 +25,7 @@ executed; waived is an explicit owner risk acceptance, not a passing check.
 | RC-05 | P1 | done | Prepare stable 0.2.0 metadata/changelog | preceding release gates | 38 focused tests, Ruff and fresh-environment wheel help/version passed; source/wheel inventories reviewed; version/lock/CI/docs agree; not published |
 | RC-06 | P1 | done | Improve safe validation feedback | owner UX request | 94 focused UX/CLI/docs tests and full 207-test offline suite passed; Ruff passed; fixed advice retains invalid_content, no offending key/value echo, all-provider output preservation |
 | GOV-01 | P1 | done | Protect remote main using an active ruleset | explicit owner request | Remote state verified protected with exact main scope and all requested controls; six focused tests, Ruff and whitespace checks passed; JSON is a reference, not automatic sync |
+| REL-021 | P0 | in-progress | Publish security patch 0.2.1 | explicit owner release request | Version/docs/lock agree, local and Linux checks pass, release workflow uploads, public PyPI installation verified |
 | SEC-01 | P0 | done | Remediate eMudhra CA/tooling dependencies | owner security request | certifi/uv floors, updated lock/publisher/CI, 232 offline tests, Ruff, build, fresh-wheel smoke and dependency audit passed; no cloud reads or publication |
 | PUB-01 | P1 | done | Prepare and test PyPI CI/delivery and public links | owner request | 229 offline tests, Ruff, actionlint, Twine 7 metadata checks, installed-wheel smoke and locked audit passed before commit; workflow/release boundaries reviewed; no actual publication |
 | PUB-02 | P1 | blocked | Configure PyPI Trusted Publisher and approval environment | owner account/setup actions | Exact owner/repo/workflow/environment binding, required reviewer/tag restrictions and explicit repository enable variable; no secrets in Git |
@@ -186,3 +187,15 @@ No live AWS requests or secret writes were performed.
   credential helpers, unrelated environments, global tools and old releases were not
   updated. No live cloud requests, remote mutation, push or publication occurred; new
   Linux CI and upstream publisher runtime verification remain unexecuted.
+
+
+## Security patch release 0.2.1
+
+- Owner explicitly authorized preparing, merging and publishing 0.2.1 through the
+  existing workflow. PR #5 is merged; v0.2.0 is already published on GitHub/PyPI.
+- Preparing a release branch/PR with version and current installation documentation;
+  no new credentials or remote settings are needed. Existing approval gates remain.
+- Local preparation passed 232 offline macOS tests, Ruff lint/format, whitespace,
+  source/wheel build, strict Twine metadata and installed-wheel help/version checks.
+  Reviewed source inventory and the wheel's certifi floor. Release CI/upload and public
+  registry verification are still pending at this commit.

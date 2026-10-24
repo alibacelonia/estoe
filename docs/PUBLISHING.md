@@ -104,8 +104,8 @@ publish step; cancel an already running/waiting job separately if necessary.
 
 ## 5. Publish one version deliberately
 
-1. Verify main's CI/audit pass and your source changes are merged. For the first
-   multi-cloud release the prepared version is `0.2.0`, so its tag is `v0.2.0`.
+1. Verify main's CI/audit pass and your source changes are merged. For this
+   security release the version is `0.2.1`, so its tag is `v0.2.1`.
 2. Review the changelog and known limitations (Azure live testing was waived).
    For later releases, update `pyproject.toml`, `uv.lock`, changelog and versioned
    docs through a PR first; package smoke tests discover the version dynamically.
@@ -119,7 +119,7 @@ publish step; cancel an already running/waiting job separately if necessary.
    [alibacelonia/estoe](https://github.com/alibacelonia/estoe).
 
 Once the package is confirmed available, test installation from PyPI in an isolated
-environment with `uv tool install estoe==0.2.0` and check `estoe --version` and help.
+environment with `uv tool install estoe==0.2.1` and check `estoe --version` and help.
 Do not test by retrieving real secrets. Update README release status to published
 only after verification. PyPI is public distribution, not a place to store secrets.
 
