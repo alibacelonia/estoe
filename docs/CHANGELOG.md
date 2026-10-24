@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.2.0 (prepared, not published)
 
+- eMudhra TLS remediation: require certifi>=2026.10.19, lock 2026.10.23, require
+  patched uv, pin CI uv 0.13.5, and update the publisher action's pip/certifi/sigstore.
+  Offline trust-store regression checks and environment/container update guidance added.
+
 - Prepared release-gated PyPI Trusted Publishing workflow with reusable CI/audit, stable
   tag/version/main ancestry guard, strict metadata checks and isolated wheel smoke.
   Upload is disabled until owner setup/enablement and release approval. No upload performed.

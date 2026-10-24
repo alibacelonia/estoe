@@ -131,3 +131,15 @@
   upload path or registry mutation is included. Pending PyPI links are explicitly labeled;
   project URLs in wheel metadata let PyPI link back to the public repository. Environment
   protection is a remote setting, not something a YAML environment name guarantees.
+
+## ADR-014: Explicit TLS trust dependency and patched installation tools
+
+- Status: accepted for the owner-requested October 2026 eMudhra remediation.
+- Decision: require certifi>=2026.10.19 at runtime and lock the latest available
+  2026.10.23; require uv>=0.13.4 and pin CI to 0.13.5. Check the default certifi and
+  botocore trust paths offline without constructing cloud clients. Update the publisher
+  to upstream merged commit 2442bad8, whose pip/certifi/sigstore meet the incident floors.
+- Consequences: package consumers receive the certifi floor even without uv.lock;
+  installer, system/custom CA and credential-helper updates remain separate. The publisher
+  pin includes the pip fix following v1.14.3; its runtime/container has not run locally.
+  No published release, remote settings, global tools, or unrelated environments change.
