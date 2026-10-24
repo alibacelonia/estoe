@@ -141,8 +141,9 @@ only after verification. PyPI is public distribution, not a place to store secre
   Deletion, yanking and credential/publisher changes require explicit owner decisions.
 
 TestPyPI is a separate service/account/publisher. No TestPyPI upload path is included
-in this initial workflow. Local tests and PR CI validate without publishing; an
-end-to-end registry upload remains untested until explicitly approved and performed.
+in this initial workflow. Local tests and PR CI validate without publishing. The owner-approved 0.2.1 release
+completed the gated upload and fresh PyPI installation verification on 2026-10-24;
+see [the release workflow](https://github.com/alibacelonia/estoe/actions/runs/40052665381).
 
 ## Official references
 
