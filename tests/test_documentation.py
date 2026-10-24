@@ -58,7 +58,7 @@ def test_readme_json_example_matches_shown_dotenv():
     assert encode_env(parse_secret(example)).decode() == expected
 
 
-def test_prepared_version_matches_installation_lock_ci_and_guides():
+def test_release_version_matches_installation_lock_ci_and_guides():
     expected = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"]
     assert version("estoe") == expected
     lock = tomllib.loads((ROOT / "uv.lock").read_text())
@@ -70,7 +70,11 @@ def test_prepared_version_matches_installation_lock_ci_and_guides():
     assert "uv run python scripts/smoke_wheel.py" in workflow
     for path in GUIDES:
         assert f"`{expected}`" in path.read_text()
-    assert f"Unreleased — {expected}" in (ROOT / "docs/CHANGELOG.md").read_text()
+    assert re.search(
+        rf"^## {re.escape(expected)} — \d{{4}}-\d{{2}}-\d{{2}}$",
+        (ROOT / "docs/CHANGELOG.md").read_text(),
+        re.MULTILINE,
+    )
 
 
 def test_main_ruleset_scope_and_required_checks():
@@ -95,12 +99,13 @@ def test_main_ruleset_scope_and_required_checks():
     assert all(check["integration_id"] == 15368 for check in status["required_status_checks"])
 
 
-def test_package_links_are_bidirectional_and_readme_does_not_claim_publication():
+def test_package_links_are_bidirectional_and_readme_explains_registry_version():
     project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
     assert project["urls"]["Repository"] == "https://github.com/alibacelonia/estoe"
     assert project["urls"]["PyPI"] == "https://pypi.org/project/estoe/"
     content = (ROOT / "README.md").read_text()
     assert project["urls"]["Repository"] in content
     assert project["urls"]["PyPI"] in content
-    assert "available after first publication" in content
-    assert "pending first publication" in content
+    assert "Check the PyPI version" in content
+    assert f"`{project['version']}`" in content
+    assert "pending first publication" not in content

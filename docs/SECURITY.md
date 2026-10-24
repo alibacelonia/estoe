@@ -2,8 +2,8 @@
 
 Automated verification uses offline synthetic tests. The owner reported a successful
 AWS pull on macOS. The agent did not retrieve live secrets; the owner-run result is not a
-claim of exhaustive live validation. GitHub distributes this release; PyPI is not configured.
-Azure/GCP implementation is on the development branch with no owner-run live verification yet.
+claim of exhaustive live validation. GitHub and PyPI distribute estoe.
+The owner reported successful GCP pull/preview; Azure live testing was waived.
 
 Use existing credentials/SSO. No command-line credential flags, telemetry, raw errors, secret
 logging, caches, clipboard output, or automatic shell sourcing are implemented. Output `.env`
@@ -93,7 +93,7 @@ python -m pip install --upgrade "certifi>=2026.10.19" "uv>=0.13.4"
 
 For this checkout, use patched uv and run `uv sync --locked`. Existing GitHub-tagged
 installations and previously built distributions do not inherit these changes: rebuild
-or reinstall from reviewed updated source. No replacement release is published here.
+or reinstall from reviewed updated source. The 0.2.1 release carries this dependency floor.
 No conda/pixi configuration or project container build exists in this repository. If
 packaging estoe in your own container, refresh the base image and system CA package and
 rebuild with `--pull --no-cache`; updating Python packages alone does not update system CAs.

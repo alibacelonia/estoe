@@ -1,10 +1,13 @@
 # Changelog
 
-## Unreleased — 0.2.0 (prepared, not published)
+## 0.2.1 — 2026-10-24
 
 - eMudhra TLS remediation: require certifi>=2026.10.19, lock 2026.10.23, require
   patched uv, pin CI uv 0.13.5, and update the publisher action's pip/certifi/sigstore.
   Offline trust-store regression checks and environment/container update guidance added.
+- Correct package installation documentation now that estoe is available on PyPI.
+
+## 0.2.0 — 2026-10-19
 
 - Prepared release-gated PyPI Trusted Publishing workflow with reusable CI/audit, stable
   tag/version/main ancestry guard, strict metadata checks and isolated wheel smoke.
@@ -26,8 +29,7 @@
   private output, application loading and troubleshooting; offline documentation checks.
 - Owner reported successful GCP pull/preview on macOS. Azure live validation was explicitly
   waived, not passed; actual Azure credentials, permissions and networking remain unverified.
-- Version metadata is prepared for 0.2.0. The published release remains AWS-only v0.1.0;
-  no new Git tag, GitHub release or PyPI upload has been created.
+- Published multi-cloud version 0.2.0 on GitHub and PyPI.
 - Actionable, fixed JSON validation explanations for syntax, root shape, duplicate keys,
   variable names, non-string values, NUL and Unicode; retain `invalid_content` and exit 1.
   No offending key/value or raw parser exception is disclosed. Help and guides explain

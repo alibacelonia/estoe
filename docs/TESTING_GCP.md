@@ -22,7 +22,7 @@ uv run estoe --version
 uv run estoe pull --help
 ```
 
-Expect `0.2.0` (prepared, not published) and `gcp` among provider choices. The AWS-only v0.1.0 does not support
+Expect `0.2.1` from this checkout and `gcp` among provider choices. The AWS-only v0.1.0 does not support
 GCP. Keep using `uv run estoe` to run this checkout, rather than an older installed command.
 
 Install the [Google Cloud CLI](https://docs.cloud.google.com/sdk/docs/install), then check

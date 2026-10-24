@@ -4,18 +4,15 @@
 secret values by hand. The multi-cloud version supports AWS Secrets Manager,
 Azure Key Vault, and Google Secret Manager.
 
-**Release status:** published GitHub release `v0.1.0` supports AWS only. This
-checkout prepares `0.2.0` (not yet published), with Azure/GCP added. The owner reported successful AWS
-pull and GCP pull/preview on macOS. Azure has offline tests, but no live test;
-the owner waived that release gate. This is not verification of live Azure
-authentication, permissions, or networking. Linux CI passed the initial multi-cloud
-PR revision on Python 3.12–3.14; subsequent changes must pass again before merging.
+estoe is available on [PyPI](https://pypi.org/project/estoe/). This source version,
+`0.2.1`, includes the eMudhra certificate dependency updates. Check the PyPI version
+before installing; a source checkout can be ahead of the registry.
+
+The owner reported successful AWS pull and GCP pull/preview on macOS. Azure is
+covered by offline tests; its live-test release gate was waived by the owner.
 
 [GitHub repository](https://github.com/alibacelonia/estoe) ·
-[PyPI package — available after first publication](https://pypi.org/project/estoe/)
-
-The PyPI destination is linked for the upcoming release; the page may return 404
-until the first successful upload. This is not a claim that estoe is published there.
+[PyPI package](https://pypi.org/project/estoe/)
 
 ## Before you start
 
@@ -48,22 +45,11 @@ installers may trust compromised eMudhra certificate chains. This checkout requi
 updated separately. See [TLS certificate updates](docs/SECURITY.md#tls-certificate-updates)
 for the environment and custom certificate-store boundaries.
 
-### Released version: AWS only
-
-```bash
-uv tool install "git+https://github.com/alibacelonia/estoe.git@v0.1.0"
-estoe --help
-estoe pull --help
-```
-
-This installs the tagged GitHub release. Until the first PyPI publication, use this
-GitHub install rather than assuming `pip install estoe` installs this project.
-
-### PyPI installation (after the first approved publication)
+### Install from PyPI
 
 First verify that [the PyPI page](https://pypi.org/project/estoe/) links back to
 [this repository](https://github.com/alibacelonia/estoe) and lists the intended version.
-Only after that version is available, install the standalone CLI with:
+Install the standalone CLI with:
 
 ```bash
 uv tool install estoe
@@ -281,7 +267,7 @@ The separate **Package and publish** workflow also validates package metadata an
 stores downloadable wheel/source artifacts. PRs and manual runs **never upload** to PyPI.
 
 Publishing is disabled by default. After one-time Trusted Publisher and approval
-setup, an approved stable GitHub release such as `v0.2.0` can publish to PyPI.
+setup, an approved stable GitHub release such as `v0.2.1` can publish to PyPI.
 No permanent PyPI token is needed. Package metadata includes the GitHub repository,
 issues, documentation and changelog URLs for PyPI's project links.
 
@@ -298,7 +284,7 @@ Merging this workflow does not publish a package or configure your PyPI account.
 - [Changelog](https://github.com/alibacelonia/estoe/blob/main/docs/CHANGELOG.md)
 
 Source, issues, and release artifacts: [alibacelonia/estoe](https://github.com/alibacelonia/estoe).
-PyPI destination: [estoe](https://pypi.org/project/estoe/) (pending first publication).
+PyPI package: [estoe](https://pypi.org/project/estoe/).
 
 ## License
 
